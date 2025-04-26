@@ -1,0 +1,291 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="pl" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LLM_Engine.market_analysis module &mdash; LLM Trading System 1.0 - dokumentacja</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=331e28ce"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/translations.js?v=da4973ce"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Indeks" href="../genindex.html" />
+    <link rel="search" title="Szukaj" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            LLM Trading System
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Szukaj" aria-label="Szukaj" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Spis treści:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../wprowadzenie.html">Wprowadzenie</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../wprowadzenie.html#czym-jest-llm-trading-system">Czym jest LLM Trading System?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wprowadzenie.html#podstawowe-zalozenia">Podstawowe założenia</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wprowadzenie.html#kluczowe-funkcjonalnosci">Kluczowe funkcjonalności</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../wprowadzenie.html#analiza-rynku-przy-uzyciu-llm">Analiza rynku przy użyciu LLM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../wprowadzenie.html#automatyczne-zarzadzanie-transakcjami">Automatyczne zarządzanie transakcjami</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../wprowadzenie.html#dashboard-monitorujacy">Dashboard monitorujący</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../wprowadzenie.html#architektura-systemu">Architektura systemu</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../wprowadzenie.html#przeplyw-danych">Przepływ danych</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../wprowadzenie.html#strategie-handlowe">Strategie handlowe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wprowadzenie.html#zarzadzanie-ryzykiem">Zarządzanie ryzykiem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wprowadzenie.html#dla-kogo-jest-ten-system">Dla kogo jest ten system?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wprowadzenie.html#pierwsze-kroki">Pierwsze kroki</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../instalacja.html">Instalacja</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../instalacja.html#wymagania-systemowe">Wymagania systemowe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../instalacja.html#kroki-instalacji">Kroki instalacji</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../instalacja.html#pobranie-repozytorium">1. Pobranie repozytorium</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../instalacja.html#instalacja-pakietow-i-zaleznosci">2. Instalacja pakietów i zależności</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../instalacja.html#uzywajac-poetry-zalecane">Używając Poetry (zalecane)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../instalacja.html#uzywajac-pip">Używając pip</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../instalacja.html#konfiguracja-srodowiska">3. Konfiguracja środowiska</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../instalacja.html#instalacja-expert-advisor-w-metatrader-5">4. Instalacja Expert Advisor w MetaTrader 5</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../instalacja.html#inicjalizacja-bazy-danych">5. Inicjalizacja bazy danych</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../instalacja.html#konfiguracja-strategii-handlowej">6. Konfiguracja strategii handlowej</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../instalacja.html#uruchamianie-systemu">Uruchamianie systemu</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../instalacja.html#uruchomienie-agenta-handlowego">1. Uruchomienie agenta handlowego</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../instalacja.html#uruchomienie-dashboardu">2. Uruchomienie dashboardu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../instalacja.html#jednorazowa-analiza-rynku">3. Jednorazowa analiza rynku</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../instalacja.html#konfiguracja-produkcyjna">Konfiguracja produkcyjna</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../instalacja.html#rozwiazywanie-problemow">Rozwiązywanie problemów</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../instalacja.html#problemy-z-polaczeniem-z-mt5">Problemy z połączeniem z MT5</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../instalacja.html#problemy-z-api-grok">Problemy z API Grok</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../instalacja.html#aktualizacja">Aktualizacja</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../instalacja.html#bezpieczenstwo">Bezpieczeństwo</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../struktura_systemu.html">Struktura systemu</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../struktura_systemu.html#glowna-struktura-katalogow">Główna struktura katalogów</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../struktura_systemu.html#komponenty-systemu-i-ich-struktura">Komponenty systemu i ich struktura</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../struktura_systemu.html#agent-manager">Agent_Manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../struktura_systemu.html#dashboard">Dashboard</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../struktura_systemu.html#database">Database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../struktura_systemu.html#llm-engine">LLM_Engine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../struktura_systemu.html#mt5-connector">MT5_Connector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../struktura_systemu.html#scripts">scripts</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../struktura_systemu.html#uruchamianie-komponentow">Uruchamianie komponentów</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../struktura_systemu.html#sposoby-uruchamiania">Sposoby uruchamiania</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../struktura_systemu.html#zaleznosci-miedzy-komponentami">Zależności między komponentami</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../struktura_systemu.html#pliki-konfiguracyjne">Pliki konfiguracyjne</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../struktura_systemu.html#uwagi-dotyczace-uruchomienia">Uwagi dotyczące uruchomienia</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../metoda_master.html">Metoda Master</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../metoda_master.html#metoda-master-zintegrowany-system-handlowy-dla-malych-kont">Metoda Master – Zintegrowany System Handlowy dla Małych Kont</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../metoda_master.html#wstep">Wstęp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../metoda_master.html#czesc-i-wybor-odpowiednich-instrumentow-dla-malego-konta">Część I: Wybór odpowiednich instrumentów dla małego konta</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../metoda_master.html#kryteria-wyboru-instrumentow">Kryteria wyboru instrumentów:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../metoda_master.html#dostosowanie-metody-master-do-par-walutowych">Dostosowanie Metody Master do par walutowych:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../metoda_master.html#forex-pary-walutowe">Forex (pary walutowe):</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../metoda_master.html#uniwersalne-zasady-handlu-parami-walutowymi">Uniwersalne zasady handlu parami walutowymi:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../metoda_master.html#czesc-ii-zintegrowany-framework-decyzyjny">Część II: Zintegrowany Framework Decyzyjny</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../metoda_master.html#krok-1-analiza-kontekstu-rynkowego-z-metody-1">Krok 1: Analiza Kontekstu Rynkowego (z Metody 1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../metoda_master.html#krok-2-analiza-krotkoterminowa-z-metody-2">Krok 2: Analiza Krótkoterminowa (z Metody 2)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../metoda_master.html#krok-3-precyzyjna-analiza-vwap-z-metody-3">Krok 3: Precyzyjna Analiza VWAP (z Metody 3)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../metoda_master.html#czesc-iii-trzy-glowne-setupy-handlowe">Część III: Trzy Główne Setupy Handlowe</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../metoda_master.html#setup-1-trend-reverter-dla-malych-kont">Setup 1: „Trend Reverter” (dla małych kont)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../metoda_master.html#setup-2-vwap-bouncer-dla-malych-kont">Setup 2: „VWAP Bouncer” (dla małych kont)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../metoda_master.html#setup-3-small-account-range-rider-specjalnie-dla-malych-kont">Setup 3: „Small Account Range Rider” (specjalnie dla małych kont)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../metoda_master.html#czesc-iv-zarzadzanie-ryzykiem-dla-malych-kont">Część IV: Zarządzanie Ryzykiem dla Małych Kont</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../metoda_master.html#reguly-podstawowe">Reguły podstawowe:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../metoda_master.html#czesc-v-praktyczne-wskazowki-dla-malych-kont">Część V: Praktyczne Wskazówki dla Małych Kont</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../metoda_master.html#czesc-vi-progresja-konta-plan-rozwoju">Część VI: Progresja Konta (Plan Rozwoju)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../metoda_master.html#faza-1-konto-500-1000">Faza 1: Konto $500-$1000</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../metoda_master.html#faza-2-konto-1000-2500">Faza 2: Konto $1000-$2500</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../metoda_master.html#faza-3-konto-2500-5000">Faza 3: Konto $2500-$5000</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../metoda_master.html#czesc-vii-checklist-przed-kazdym-tradem">Część VII: Checklist przed każdym Tradem</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../uruchamianie.html">Uruchamianie</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../uruchamianie.html#wymagania-wstepne">Wymagania wstępne</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../uruchamianie.html#uruchomienie-calego-systemu">Uruchomienie całego systemu</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../uruchamianie.html#uruchamianie-poszczegolnych-komponentow">Uruchamianie poszczególnych komponentów</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../uruchamianie.html#database">Database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../uruchamianie.html#mt5-connector">MT5_Connector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../uruchamianie.html#llm-engine">LLM_Engine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../uruchamianie.html#agent-manager">Agent_Manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../uruchamianie.html#dashboard">Dashboard</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../uruchamianie.html#skrypty-pomocnicze">Skrypty pomocnicze</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../uruchamianie.html#inicjalizacja-bazy-danych">Inicjalizacja bazy danych</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../uruchamianie.html#konfiguracja-srodowiska">Konfiguracja środowiska</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../uruchamianie.html#jednorazowa-analiza-rynku">Jednorazowa analiza rynku</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../uruchamianie.html#monitorowanie-systemu">Monitorowanie systemu</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../uruchamianie.html#monitorowanie-w-czasie-rzeczywistym">Monitorowanie w czasie rzeczywistym</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../uruchamianie.html#monitorowanie-w-trybie-tekstowym">Monitorowanie w trybie tekstowym</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../uruchamianie.html#logi-systemowe">Logi systemowe</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../uruchamianie.html#zatrzymywanie-systemu">Zatrzymywanie systemu</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../uruchamianie.html#zatrzymanie-calego-systemu">Zatrzymanie całego systemu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../uruchamianie.html#zatrzymanie-pojedynczego-komponentu">Zatrzymanie pojedynczego komponentu</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../uruchamianie.html#automatyczny-restart">Automatyczny restart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../uruchamianie.html#uruchamianie-w-srodowisku-produkcyjnym">Uruchamianie w środowisku produkcyjnym</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../uruchamianie.html#rozwiazywanie-problemow">Rozwiązywanie problemów</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../komponenty/index.html">Komponenty</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../komponenty/agent_manager.html">Agent Manager</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../komponenty/agent_manager.html#funkcje">Funkcje</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../komponenty/agent_manager.html#struktura-modulu">Struktura modułu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../komponenty/agent_manager.html#glowne-klasy-i-ich-rola">Główne klasy i ich rola</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../komponenty/agent_manager.html#agentmanager">AgentManager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../komponenty/agent_manager.html#coordinator">Coordinator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../komponenty/agent_manager.html#orderprocessor">OrderProcessor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../komponenty/agent_manager.html#riskmanager">RiskManager</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../komponenty/agent_manager.html#uruchamianie">Uruchamianie</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../komponenty/agent_manager.html#konfiguracja">Konfiguracja</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../komponenty/agent_manager.html#przeplyw-pracy">Przepływ pracy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../komponenty/agent_manager.html#logi">Logi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../komponenty/agent_manager.html#rozwiazywanie-problemow">Rozwiązywanie problemów</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../komponenty/llm_engine.html">LLM Engine</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../komponenty/llm_engine.html#funkcje">Funkcje</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../komponenty/llm_engine.html#struktura-modulu">Struktura modułu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../komponenty/llm_engine.html#glowne-klasy-i-ich-rola">Główne klasy i ich rola</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../komponenty/llm_engine.html#llmengine">LLMEngine</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../komponenty/llm_engine.html#llmclient">LLMClient</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../komponenty/llm_engine.html#promptbuilder">PromptBuilder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../komponenty/llm_engine.html#responseparser">ResponseParser</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../komponenty/llm_engine.html#marketanalyzer">MarketAnalyzer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../komponenty/llm_engine.html#technicalindicators-i-advancedindicators">TechnicalIndicators i AdvancedIndicators</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../komponenty/llm_engine.html#cachemanager">CacheManager</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../komponenty/llm_engine.html#uruchamianie">Uruchamianie</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../komponenty/llm_engine.html#konfiguracja">Konfiguracja</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../komponenty/llm_engine.html#przeplyw-pracy">Przepływ pracy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../komponenty/llm_engine.html#szablony-promptow">Szablony promptów</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../komponenty/llm_engine.html#parsowanie-odpowiedzi">Parsowanie odpowiedzi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../komponenty/llm_engine.html#rozwiazywanie-problemow">Rozwiązywanie problemów</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../komponenty/llm_engine.html#integracja-z-innymi-komponentami">Integracja z innymi komponentami</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../komponenty/llm_engine.html#api-komponentu">API komponentu</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Dokumentacja API</a><ul class="simple">
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">LLM Trading System</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">LLM_Engine.market_analysis module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/LLM_Engine.market_analysis.rst.txt" rel="nofollow"> Zobacz źródło strony</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="llm-engine-market-analysis-module">
+<h1>LLM_Engine.market_analysis module<a class="headerlink" href="#llm-engine-market-analysis-module" title="Link to this heading"></a></h1>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Prawa zastrzeżone 2024, Mariusz.</p>
+  </div>
+
+  Zbudowano w <a href="https://www.sphinx-doc.org/">Sphinx</a> używając
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    dostarczone przez <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

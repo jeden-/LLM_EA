@@ -457,6 +457,23 @@ class LLMInterface:
         logger.error(f"Failed to generate response after {self.max_retries} attempts")
         raise Exception(f"Failed to generate response from {provider}/{model} after {self.max_retries} attempts")
     
+    def generate(
+        self,
+        prompt: str,
+        system_prompt: str = "Jesteś pomocnym asystentem",
+        provider: Optional[str] = None,
+        model: Optional[str] = None,
+        **kwargs
+    ) -> str:
+        """Alias dla metody generate_response dla zachowania kompatybilności."""
+        return self.generate_response(
+            prompt=prompt,
+            system_prompt=system_prompt,
+            provider_name=provider,
+            model=model,
+            **kwargs
+        )
+    
     def get_usage_stats(self) -> Dict[str, Any]:
         """
         Get current usage statistics.

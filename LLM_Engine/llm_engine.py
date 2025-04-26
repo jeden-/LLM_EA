@@ -18,7 +18,7 @@ import time
 from LLM_Engine.config import Config
 from LLM_Engine.grok_client import GrokClient
 from LLM_Engine.prompt_builder import PromptBuilder
-from LLM_Engine.response_parser import ResponseParser
+from LLM_Engine.response_parser import ResponseParserFactory
 from LLM_Engine.market_analyzer import MarketAnalyzer
 from LLM_Engine.cache_manager import CacheManager
 
@@ -69,7 +69,7 @@ class LLMEngine:
         self.prompt_builder = PromptBuilder(templates_path=templates_path)
         
         # Inicjalizacja parsera odpowiedzi
-        self.response_parser = ResponseParser()
+        self.response_parser = ResponseParserFactory.get_parser("market_analysis")
         
         # Inicjalizacja analizatora rynku
         self.market_analyzer = MarketAnalyzer(llm_interface=self.llm_client)
@@ -272,153 +272,189 @@ class LLMEngine:
         
         return validated_response
     
-    def generate_trade_idea(
+    def calculate_stop_loss(
         self,
-        market_data: Dict[str, Any],
-        risk_profile: str = "balanced",
-        max_risk_per_trade_pct: float = 2.0
+        entry_price: float,
+        risk_level: str,
+        trend: str,
+        support_levels: List[float],
+        volatility: float
     ) -> Dict[str, Any]:
         """
-        Generuje pomysł na transakcję na podstawie danych rynkowych.
+        Oblicza poziom stop loss na podstawie analizy rynku.
         
         Args:
-            market_data: Słownik z danymi rynkowymi
-            risk_profile: Profil ryzyka ("conservative", "balanced", "aggressive")
-            max_risk_per_trade_pct: Maksymalny procent ryzyka na transakcję
+            entry_price: Cena wejścia
+            risk_level: Poziom ryzyka ("low", "medium", "high")
+            trend: Kierunek trendu ("up", "down", "sideways")
+            support_levels: Lista poziomów wsparcia
+            volatility: Zmienność rynku (np. ATR)
             
         Returns:
-            Dict[str, Any]: Pomysł na transakcję
+            Dict[str, Any]: Słownik z poziomem stop loss i uzasadnieniem
         """
-        symbol = market_data.get("symbol", "Unknown")
-        timeframe = market_data.get("timeframe", "Unknown")
-        current_price = market_data.get("current_price", 0.0)
+        # Sortowanie poziomów wsparcia
+        support_levels = sorted(support_levels)
         
-        # Generowanie unikalnego klucza cache
-        cache_key = self._generate_cache_key(
-            "trade_idea",
-            symbol=symbol,
-            timeframe=timeframe,
-            current_price=current_price,
-            risk_profile=risk_profile
-        )
-        
-        # Sprawdzenie cache
-        cached_result = self.cache_manager.get(cache_key)
-        if cached_result:
-            logger.info(f"Znaleziono pomysł w cache dla {symbol} {timeframe}")
-            return cached_result
-        
-        # Uproszczenie danych rynkowych do promptu
-        price_data = market_data.get("price_data", [])
-        last_candles = price_data[-5:] if len(price_data) >= 5 else price_data
-        
-        # Budowanie promptu
-        prompt = f"""
-        Wygeneruj pomysł na transakcję dla:
-        Symbol: {symbol}
-        Przedział czasowy: {timeframe}
-        Aktualny kurs: {current_price}
-        Profil ryzyka: {risk_profile}
-        Maksymalne ryzyko na transakcję: {max_risk_per_trade_pct}%
-        
-        Ostatnie świece:
-        """
-        
-        for candle in last_candles:
-            prompt += f"- O: {candle.get('open')}, H: {candle.get('high')}, L: {candle.get('low')}, C: {candle.get('close')}\n"
-        
-        prompt += """
-        Określ:
-        1. Kierunek transakcji (buy/sell)
-        2. Uzasadnienie
-        3. Poziom wejścia
-        4. Stop loss
-        5. Take profit
-        
-        Odpowiedź podaj w formacie JSON.
-        """
-        
-        # Generowanie odpowiedzi
-        schema = {
-            "direction": "buy/sell",
-            "entry": "float or range",
-            "stop_loss": "float",
-            "take_profit": "float",
-            "rationale": "string",
-            "confidence": "0-10 scale",
-            "timeframe": "string"
+        # Mnożnik ATR w zależności od poziomu ryzyka
+        risk_multipliers = {
+            "low": 1.0,
+            "medium": 1.5,
+            "high": 2.0
         }
         
+        # Domyślny mnożnik dla nieznanego poziomu ryzyka
+        multiplier = risk_multipliers.get(risk_level.lower(), 1.5)
+        
+        # Obliczenie stop loss na podstawie ATR
+        atr_stop = entry_price - (volatility * multiplier)
+        
+        # Znalezienie najbliższego poziomu wsparcia poniżej ceny wejścia
+        closest_support = None
+        for level in reversed(support_levels):
+            if level < entry_price:
+                closest_support = level
+                break
+        
+        # Wybór poziomu stop loss
+        if closest_support and closest_support > atr_stop:
+            stop_loss = closest_support
+            reason = "Stop loss ustawiony na najbliższym poziomie wsparcia"
+        else:
+            stop_loss = atr_stop
+            reason = f"Stop loss ustawiony na {multiplier}x ATR poniżej ceny wejścia"
+        
+        return {
+            "stop_loss": round(stop_loss, 5),
+            "reason": reason,
+            "risk_multiplier": multiplier,
+            "based_on_support": bool(closest_support and closest_support > atr_stop)
+        }
+    
+    def calculate_take_profit(
+        self,
+        entry_price: float,
+        risk_reward: float,
+        stop_loss: float,
+        resistance_levels: List[float],
+        trend: str
+    ) -> Dict[str, Any]:
+        """
+        Oblicza poziom take profit na podstawie analizy rynku.
+        
+        Args:
+            entry_price: Cena wejścia
+            risk_reward: Oczekiwany stosunek zysku do ryzyka
+            stop_loss: Poziom stop loss
+            resistance_levels: Lista poziomów oporu
+            trend: Kierunek trendu ("up", "down", "sideways")
+            
+        Returns:
+            Dict[str, Any]: Słownik z poziomem take profit i uzasadnieniem
+        """
+        # Sortowanie poziomów oporu
+        resistance_levels = sorted(resistance_levels)
+        
+        # Obliczenie minimalnego take profit na podstawie risk/reward
+        risk = abs(entry_price - stop_loss)
+        min_take_profit = entry_price + (risk * risk_reward)
+        
+        # Znalezienie najbliższego poziomu oporu powyżej minimalnego take profit
+        closest_resistance = None
+        for level in resistance_levels:
+            if level > min_take_profit:
+                closest_resistance = level
+                break
+        
+        # Wybór poziomu take profit
+        if closest_resistance:
+            take_profit = closest_resistance
+            reason = "Take profit ustawiony na najbliższym poziomie oporu"
+            actual_rr = abs(take_profit - entry_price) / risk
+        else:
+            take_profit = min_take_profit
+            reason = f"Take profit ustawiony dla R:R {risk_reward}"
+            actual_rr = risk_reward
+        
+        return {
+            "take_profit": round(take_profit, 5),
+            "reason": reason,
+            "risk_reward": round(actual_rr, 2),
+            "based_on_resistance": bool(closest_resistance)
+        }
+        
+    def generate_trade_idea(
+        self,
+        market_analysis: Dict[str, Any],
+        risk_assessment: Dict[str, Any],
+        current_price: float
+    ) -> Dict[str, Any]:
+        """
+        Generuje pomysł handlowy na podstawie analizy rynku i oceny ryzyka.
+        
+        Args:
+            market_analysis: Wynik analizy rynku
+            risk_assessment: Ocena ryzyka
+            current_price: Aktualna cena
+            
+        Returns:
+            Dict[str, Any]: Pomysł handlowy z poziomami wejścia, SL i TP
+        """
+        # Budowanie promptu
+        prompt = self.prompt_builder.build_trade_idea_prompt(
+            market_analysis=market_analysis,
+            risk_assessment=risk_assessment,
+            current_price=current_price
+        )
+        
+        # Generowanie odpowiedzi
         response = self.llm_client.generate_with_json_output(
             prompt=prompt,
-            system_prompt="Jesteś doświadczonym traderem. Generujesz konkretne pomysły na transakcje.",
-            schema=schema
+            system_prompt="Jesteś doświadczonym traderem. Generujesz precyzyjne pomysły handlowe."
         )
         
         # Walidacja odpowiedzi
-        validated_response = {}
+        parser = ResponseParserFactory.get_parser("trade_idea")
+        validated_response = parser.parse(response)
         
-        # Sprawdzenie, czy response jest stringiem i ewentualne parsowanie do słownika
-        if isinstance(response, str):
-            try:
-                import json
-                response = json.loads(response)
-            except json.JSONDecodeError:
-                logger.error(f"Nie można sparsować odpowiedzi JSON: {response}")
-                response = {}
-
-        if "direction" in response:
-            validated_response["direction"] = response["direction"].lower()
-        else:
-            validated_response["direction"] = "hold"
+        # Upewnij się, że mamy wszystkie wymagane pola
+        if not validated_response.get("direction") or not validated_response.get("stop_loss") or not validated_response.get("take_profit"):
+            # Jeśli brakuje któregoś z wymaganych pól, oblicz je na podstawie analizy rynku
+            trend = market_analysis.get("trend", "neutral").lower()
+            direction = "buy" if trend == "bullish" else "sell" if trend == "bearish" else "hold"
             
-        if "entry" in response:
-            try:
-                # Obsługa zarówno liczby jak i zakresu (np. "1.0800-1.0820")
-                entry_value = response["entry"]
-                if isinstance(entry_value, (int, float)):
-                    validated_response["entry"] = float(entry_value)
-                elif isinstance(entry_value, str) and "-" in entry_value:
-                    entry_range = entry_value.split("-")
-                    validated_response["entry_min"] = float(entry_range[0])
-                    validated_response["entry_max"] = float(entry_range[1])
-                else:
-                    validated_response["entry"] = float(entry_value)
-            except (ValueError, TypeError):
-                validated_response["entry"] = current_price
-        else:
-            validated_response["entry"] = current_price
+            if direction != "hold":
+                # Oblicz poziomy SL i TP
+                levels = self.calculate_stop_loss_take_profit(
+                    symbol=market_analysis.get("symbol", ""),
+                    position_type=direction,
+                    entry_price=current_price,
+                    market_data=market_analysis
+                )
+                
+                validated_response.update({
+                    "direction": direction,
+                    "entry_price": current_price,
+                    "stop_loss": levels["stop_loss"],
+                    "take_profit": levels["take_profit"],
+                    "risk_reward": round(levels["reward_pips"] / levels["risk_pips"], 2) if levels["risk_pips"] > 0 else 0
+                })
+            else:
+                validated_response.update({
+                    "direction": "hold",
+                    "entry_price": 0,
+                    "stop_loss": 0,
+                    "take_profit": 0,
+                    "risk_reward": 0
+                })
         
-        # Domyślne wartości dla stop loss i take profit
-        sl_default = current_price * 0.99 if validated_response["direction"] == "buy" else current_price * 1.01
-        tp_default = current_price * 1.02 if validated_response["direction"] == "buy" else current_price * 0.98
-        
-        validated_response["stop_loss"] = float(response.get("stop_loss", sl_default))
-        validated_response["take_profit"] = float(response.get("take_profit", tp_default))
-        validated_response["rationale"] = response.get("rationale", "Brak uzasadnienia")
-        validated_response["confidence"] = int(response.get("confidence", 5))
-        
-        # Obliczanie stosunku zysku do ryzyka
-        if validated_response["direction"] == "buy":
-            risk = validated_response["entry"] - validated_response["stop_loss"]
-            reward = validated_response["take_profit"] - validated_response["entry"]
-        else:
-            risk = validated_response["stop_loss"] - validated_response["entry"]
-            reward = validated_response["entry"] - validated_response["take_profit"]
-            
-        validated_response["risk_reward_ratio"] = round(reward / risk, 2) if risk > 0 else 0
-        
-        # Dodanie metadanych
+        # Dodaj metadane
         validated_response["metadata"] = {
             "timestamp": datetime.now().isoformat(),
-            "symbol": symbol,
-            "timeframe": timeframe,
-            "current_price": current_price,
-            "risk_profile": risk_profile
+            "model": self.config.model_name,
+            "market_conditions": market_analysis.get("market_conditions", {}),
+            "risk_level": risk_assessment.get("level", "medium")
         }
-        
-        # Zapis do cache
-        self.cache_manager.set(cache_key, validated_response)
         
         return validated_response
     

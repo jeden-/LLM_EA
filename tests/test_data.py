@@ -55,7 +55,7 @@ class TestData:
             time_delta = timedelta(hours=1)
         
         # Generacja danych
-        np.random.seed(42)  # Dla powtarzalności
+        # Seed jest ustawiany w setUp() klas testowych
         
         dates = [start_date + i * time_delta for i in range(num_candles)]
         
@@ -115,15 +115,22 @@ class TestData:
         """
         base_data = TestData.generate_ohlc_data(symbol=symbol, num_candles=num_candles)
         
-        # Dodanie komponentu trendu
-        trend_factor = 0.005 if trend == 'up' else -0.005
+        # Silniejszy komponent trendu
+        trend_factor = 0.01 if trend == 'up' else -0.01
         
         for i in range(1, len(base_data)):
+            # Progresywna zmiana ceny
             trend_change = (i / num_candles) * trend_factor * base_data.iloc[0]['close']
-            base_data.iloc[i, base_data.columns.get_loc('open')] += trend_change
-            base_data.iloc[i, base_data.columns.get_loc('high')] += trend_change
-            base_data.iloc[i, base_data.columns.get_loc('low')] += trend_change
-            base_data.iloc[i, base_data.columns.get_loc('close')] += trend_change
+            
+            # Dodanie losowego szumu do trendu
+            noise = np.random.normal(0, 0.0005) * base_data.iloc[0]['close']
+            total_change = trend_change + noise
+            
+            # Aplikowanie zmiany do wszystkich cen OHLC
+            base_data.iloc[i, base_data.columns.get_loc('open')] += total_change
+            base_data.iloc[i, base_data.columns.get_loc('high')] += total_change
+            base_data.iloc[i, base_data.columns.get_loc('low')] += total_change
+            base_data.iloc[i, base_data.columns.get_loc('close')] += total_change
         
         return base_data
     
@@ -216,30 +223,31 @@ class TestData:
             closest_level_idx = distances.index(min(distances))
             closest_level = levels[closest_level_idx]
             
-            # Jeśli cena jest blisko poziomu (w odległości 0.5%), dostosuj ją
-            if min(distances) / price < 0.005:
-                # 50% szans na odbicie, 50% na przebicie
-                if np.random.random() > 0.5:
+            # Jeśli cena jest blisko poziomu (w odległości 1%), dostosuj ją
+            if min(distances) / price < 0.01:
+                # 70% szans na odbicie, 30% na przebicie
+                if np.random.random() > 0.3:
                     # Odbicie
                     direction = 1 if price < closest_level else -1
-                    adjustment = abs(price - closest_level) * 0.5 * direction
+                    adjustment = abs(price - closest_level) * direction
                     
-                    base_data.iloc[i, base_data.columns.get_loc('close')] = price + adjustment
+                    # Aplikowanie silniejszego odbicia
+                    base_data.iloc[i, base_data.columns.get_loc('close')] = closest_level + adjustment * 0.5
                     
                     # Dostosuj high/low
                     if direction > 0:
                         base_data.iloc[i, base_data.columns.get_loc('high')] = max(
                             base_data.iloc[i]['high'],
-                            closest_level + abs(adjustment) * 0.2
+                            closest_level + abs(adjustment)
                         )
                     else:
                         base_data.iloc[i, base_data.columns.get_loc('low')] = min(
                             base_data.iloc[i]['low'],
-                            closest_level - abs(adjustment) * 0.2
+                            closest_level - abs(adjustment)
                         )
                 else:
-                    # Przebicie
-                    pass  # Zachowaj obecną cenę
+                    # Przebicie - zostawiamy cenę bez zmian
+                    pass
         
         return base_data
     

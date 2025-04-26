@@ -64,19 +64,19 @@ COMPONENTS = {
         "restart_cooldown": 30,  # sekundy
     },
     "llm_engine": {
-        "script": "LLM_Engine/run_llm_engine.py",
+        "script": "LLM_Engine/run_engine.py",
         "required": True,
         "restart_attempts": 3,
         "restart_cooldown": 60,  # sekundy
     },
     "mt5_connector": {
-        "script": "MT5_Connector/run_mt5_connector.py",
+        "script": "MT5_Connector/run_connector.py",
         "required": True,
         "restart_attempts": 3,
         "restart_cooldown": 30,  # sekundy
     },
     "agent_manager": {
-        "script": "Agent_Manager/run_agent_manager.py",
+        "script": "Agent_Manager/run_manager.py",
         "required": True,
         "restart_attempts": 3,
         "restart_cooldown": 30,  # sekundy

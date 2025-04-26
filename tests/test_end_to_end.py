@@ -124,110 +124,138 @@ class TestEndToEnd(unittest.TestCase):
         
         # Konfiguracja odpowiedzi z LLM dla analizy rynku
         cls.mock_llm_engine_instance.analyze_market.return_value = {
-            'symbol': 'EURUSD',
-            'timeframe': 'H1',
-            'direction': 'BUY',
-            'confidence': 0.8,
-            'entry_price': 1.1050,
-            'stop_loss': 1.1000,
-            'take_profit': 1.1150,
             'analysis': {
-                'trend': 'upward',
-                'strength': 'moderate',
-                'support_levels': [1.1000, 1.0950],
-                'resistance_levels': [1.1100, 1.1150],
                 'indicators': {
                     'rsi': 60,
                     'macd': 'bullish',
                     'bollinger': 'middle_band',
                     'moving_averages': 'bullish'
+                },
+                'trend': {
+                    'direction': 'bullish',
+                    'strength': 7,
+                    'volatility': 'moderate'
+                },
+                'support_levels': [1.1000, 1.0950],
+                'resistance_levels': [1.1100, 1.1150],
+                'key_levels': {
+                    'support': [1.1000, 1.0950],
+                    'resistance': [1.1100, 1.1150]
                 }
             },
-            'risk_assessment': {
-                'risk_reward': 2.0,
-                'market_volatility': 'moderate',
-                'recommended_position_size': 0.1
-            },
-            'justification': 'Price is in an uptrend with bullish indicators. RSI is showing moderate strength and price is above key moving averages.'
+            'recommendation': 'BUY',
+            'confidence': 0.8,
+            'entry_price': 1.1050,
+            'stop_loss': 1.1000,
+            'take_profit': 1.1150,
+            'risk_reward_ratio': 2.0,
+            'timeframe': 'H1'
         }
     
     def setUp(self):
         """Konfiguracja środowiska przed każdym testem."""
-        # Czyszczenie bazy danych i upewnienie się że połączenie jest aktywne
-        self.db_handler = DatabaseHandler(db_path=self.db_path)
-        self.db_handler.init_database()
-        self.db_handler.clear_database()
-        
-        # Resetowanie mocking stanu
-        self.mock_mt5_connector_instance.get_open_positions.reset_mock()
-        self.mock_mt5_connector_instance.get_open_positions.return_value = []
-        
-        self.mock_mt5_connector_instance.send_market_order.reset_mock()
-        self.mock_mt5_connector_instance.send_market_order.return_value = {
-            'order_id': 12345,
-            'executed_price': 1.1052,
-            'status': 'executed',
-            'message': 'Market order executed'
+        # Inicjalizacja bazy danych w pamięci
+        self.db_handler = DatabaseHandler(":memory:", auto_init=True)
+        self.assertTrue(self.db_handler.connect())
+        self.assertTrue(self.db_handler.init_database())
+
+        # Mockowanie MT5 Connector
+        self.mock_mt5_connector_instance = MagicMock()
+        self.mock_mt5_connector_instance.connect.return_value = True
+        self.mock_mt5_connector_instance.disconnect.return_value = True
+        self.mock_mt5_connector_instance.send_market_order = MagicMock()
+        self.mock_mt5_connector_instance.get_open_positions = MagicMock()
+        self.mock_mt5_connector_instance.get_trade_history = MagicMock()
+
+        # Mockowanie LLM Engine
+        self.mock_llm_engine_instance = MagicMock()
+        self.mock_llm_engine_instance.analyze_market.return_value = {
+            'analysis': {
+                'indicators': {
+                    'rsi': 60,
+                    'macd': 'bullish',
+                    'bollinger': 'middle_band',
+                    'moving_averages': 'bullish'
+                },
+                'trend': {
+                    'direction': 'bullish',
+                    'strength': 7,
+                    'volatility': 'moderate'
+                },
+                'support_levels': [1.1000, 1.0950],
+                'resistance_levels': [1.1100, 1.1150],
+                'key_levels': {
+                    'support': [1.1000, 1.0950],
+                    'resistance': [1.1100, 1.1150]
+                }
+            },
+            'recommendation': 'BUY',
+            'confidence': 0.8,
+            'entry_price': 1.1050,
+            'stop_loss': 1.1000,
+            'take_profit': 1.1150,
+            'risk_reward_ratio': 2.0,
+            'timeframe': 'H1'
         }
+
+        # Inicjalizacja Risk Managera
+        self.risk_manager = RiskManager(self.db_handler, self.mock_mt5_connector_instance)
         
-        # Upewnij się, że symulowany jest poprawny dostęp do danych rynkowych
-        self.mock_mt5_connector_instance.get_candles.return_value = pd.DataFrame({
-            'time': [(datetime.now() - timedelta(hours=i)).isoformat() for i in range(5, 0, -1)],
-            'open': [1.1000, 1.1010, 1.1020, 1.1030, 1.1040],
-            'high': [1.1020, 1.1030, 1.1040, 1.1050, 1.1060],
-            'low': [1.0990, 1.1000, 1.1010, 1.1020, 1.1030],
-            'close': [1.1010, 1.1020, 1.1030, 1.1040, 1.1050],
-            'volume': [1000, 1100, 1050, 950, 1200],
-            'sma_50': [1.1015, 1.1025, 1.1035, 1.1045, 1.1055],
-            'ema_20': [1.1010, 1.1020, 1.1030, 1.1040, 1.1050],
-            'rsi': [55, 57, 59, 61, 65],
-            'atr': [0.0020, 0.0021, 0.0019, 0.0022, 0.0018],
-            'macd': [0.0001, 0.0002, 0.0003, 0.0004, 0.0005],
-            'macd_signal': [0.0002, 0.0002, 0.0003, 0.0003, 0.0004],
-            'bollinger_upper': [1.1050, 1.1060, 1.1070, 1.1080, 1.1090],
-            'bollinger_middle': [1.1010, 1.1020, 1.1030, 1.1040, 1.1050],
-            'bollinger_lower': [1.0970, 1.0980, 1.0990, 1.1000, 1.1010],
-            'vwap': [1.1005, 1.1015, 1.1025, 1.1035, 1.1045]
-        })
-        
-        # Konfiguracja komponentów systemu
-        self.risk_manager = RiskManager(db_handler=self.db_handler)
-        self.risk_manager.set_mt5_connector(self.mock_mt5_connector_instance)
-        
+        # Inicjalizacja Order Processor
         self.order_processor = OrderProcessor(
-            db_handler=self.db_handler,
-            mt5_connector=self.mock_mt5_connector_instance
+            self.mock_mt5_connector_instance,
+            self.db_handler,
+            self.risk_manager
         )
         
-        # Tworzymy AgentCoordinator zgodnie z aktualną implementacją
+        # Inicjalizacja Agent Coordinator
         self.agent_coordinator = AgentCoordinator(
-            db_handler=self.db_handler,
             llm_engine=self.mock_llm_engine_instance,
-            mt5_connector=self.mock_mt5_connector_instance
+            mt5_connector=self.mock_mt5_connector_instance,
+            db_handler=self.db_handler
         )
         
-        # Ręcznie ustawiamy risk_manager i order_processor
+        # Podmiana komponentów utworzonych przez AgentCoordinator na nasze mocki
         self.agent_coordinator.risk_manager = self.risk_manager
         self.agent_coordinator.order_processor = self.order_processor
-        
-        # Przeładowujemy metodę analyze_market, aby używała danych z mocka
-        def mock_analyze_market(symbol, timeframe, force=False):
-            # Ignorujemy wywołanie MT5 i używamy bezpośrednio mocka LLM
-            result = self.mock_llm_engine_instance.analyze_market.return_value
-            result['symbol'] = symbol  # Upewniamy się, że symbol jest zgodny z żądaniem
+
+        # Mockowanie metod
+        def mock_analyze_market(symbol, timeframe):
+            """Mock dla analizy rynku."""
+            analysis_data = {
+                'analysis': {
+                    'indicators': {
+                        'rsi': 60,
+                        'macd': 'bullish',
+                        'bollinger': 'middle_band',
+                        'moving_averages': 'bullish'
+                    },
+                    'trend': {
+                        'direction': 'bullish',
+                        'strength': 7,
+                        'volatility': 'moderate'
+                    },
+                    'support_levels': [1.1000, 1.0950],
+                    'resistance_levels': [1.1100, 1.1150]
+                },
+                'direction': 'BUY',
+                'entry_price': 1.1050,
+                'stop_loss': 1.1000,
+                'take_profit': 1.1150,
+                'confidence': 0.8,
+                'timeframe': timeframe
+            }
             
             # Zapisz analizę w bazie danych
             analysis_id = self.db_handler.insert_market_analysis(
                 symbol=symbol,
-                timeframe=str(timeframe) if isinstance(timeframe, int) else timeframe,
-                analysis_data=result
+                timeframe=timeframe,
+                analysis_data=analysis_data
             )
             
-            # Dodaj id analizy do wyniku
-            result['analysis_id'] = analysis_id
-            
-            return result
-            
+            analysis_data['analysis_id'] = analysis_id
+            return analysis_data
+
         # Zastąp metodę
         self.agent_coordinator.analyze_market = mock_analyze_market
         

@@ -33,17 +33,22 @@ Parametry:
 
 ## Zarządzanie i monitorowanie
 
-### monitoring.py
-
-Skrypt monitorujący działanie systemu, analizujący logi i wykrywający problemy.
-
-```bash
-python -m scripts.monitoring [--interval SEC] [--single] [--env dev|test|prod]
-```
-
 ### monitor_system.py
 
-Biblioteka funkcji monitorujących używana przez monitoring.py i inne skrypty.
+Główny skrypt monitorujący działanie systemu, analizujący logi, wykrywający problemy i umożliwiający automatyczne restartowanie komponentów.
+
+```bash
+python scripts/monitor_system.py --env dev|test|prod [--interval SEC] [--debug] [--auto-restart] [--email-notify] [--db-auto-fix] [--db-check-interval SECONDS]
+```
+
+Parametry:
+- `--env` - środowisko uruchomieniowe (dev, test, prod)
+- `--interval` - interwał sprawdzania w sekundach (domyślnie 300)
+- `--debug` - uruchomienie w trybie debugowania
+- `--auto-restart` - automatyczne restartowanie niedziałających komponentów
+- `--email-notify` - powiadamianie o problemach przez e-mail
+- `--db-auto-fix` - automatyczna naprawa problemów z bazą danych
+- `--db-check-interval` - interwał sprawdzania bazy danych w sekundach (domyślnie 7200)
 
 ### run_agent.py
 
@@ -89,44 +94,12 @@ Skrypt do przeprowadzania analizy rynku i generowania sygnałów handlowych.
 python -m scripts.run_analysis --symbol SYMBOL --timeframe TIMEFRAME [--strategy STRATEGY] [--indicators IND1,IND2]
 ```
 
-### show_analysis.py
-
-Skrypt do wizualizacji wyników analizy rynku.
-
-```bash
-python -m scripts.show_analysis --analysis-id ID [--save-chart] [--output DIR]
-```
-
-### validate_llm_performance.py
-
-Skrypt do walidacji wydajności modeli LLM w zakresie analizy rynku.
-
-```bash
-python -m scripts.validate_llm_performance [--model MODEL] [--test-set SET] [--rounds NUM]
-```
-
 ### generate_test_data.py
 
 Skrypt do generowania danych testowych do walidacji modeli i algorytmów.
 
 ```bash
 python -m scripts.generate_test_data [--symbols SYM1,SYM2] [--timeframes TF1,TF2] [--start DATE] [--end DATE]
-```
-
-### demo_llm_engine.py
-
-Demonstracja działania silnika LLM z możliwością interaktywnej interakcji.
-
-```bash
-python -m scripts.demo_llm_engine [--model MODEL] [--interactive]
-```
-
-### mt5_connector_example.py
-
-Przykład użycia konektora MT5 do pobierania danych rynkowych i realizacji zleceń.
-
-```bash
-python -m scripts.mt5_connector_example [--symbol SYMBOL] [--timeframe TIMEFRAME] [--demo]
 ```
 
 ## Narzędzia do diagnostyki i naprawy bazy danych

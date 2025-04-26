@@ -60,58 +60,20 @@ def extract_json_from_response(response_text: str) -> Optional[Dict[str, Any]]:
     Returns:
         Sparsowany obiekt JSON lub None, jeśli nie znaleziono poprawnego JSON
     """
-    # Specjalna obsługa dla znanego problematycznego przypadku w testach
-    if '"key_levels:' in response_text and '"support":' in response_text:
-        logger.debug("Wykryto problematyczny przypadek JSON z testów, zwracam None")
-        return None
+    from LLM_Engine.response_parser import ResponseParserFactory
     
-    # Wzorce do wyszukiwania bloków JSON
-    patterns = [
-        r'```json\s*([\s\S]*?)\s*```',  # JSON w bloku kodu markdown
-        r'```\s*([\s\S]*?)\s*```',       # JSON w ogólnym bloku kodu
-        r'(\{[\s\S]*\})',                # Samodzielny obiekt JSON
-        r'(\[[\s\S]*\])'                 # Samodzielna tablica JSON
-    ]
-    
-    # Próba dopasowania każdego wzorca
-    for pattern in patterns:
-        matches = re.findall(pattern, response_text)
-        if matches:
-            for match in matches:
-                match = match.strip()
-                logger.debug(f"Próba parsowania dopasowania: {match}")
-                try:
-                    json_result = json.loads(match)
-                    logger.debug(f"Sparsowano JSON: {json_result}")
-                    
-                    # Dodatkowa weryfikacja - jeśli to prosta tablica liczb,
-                    # a w oryginale mamy pewne struktury, to prawdopodobnie 
-                    # sparsowaliśmy fragment niepoprawnego JSONa
-                    if (isinstance(json_result, list) and 
-                        all(isinstance(x, (int, float)) for x in json_result) and
-                        ('"key_levels' in response_text or 'key_levels:' in response_text)):
-                        logger.debug("Wykryto tablicę liczb w kontekście key_levels, ignorowanie")
-                        continue
-                    
-                    if json_result is not None:
-                        return json_result
-                except json.JSONDecodeError as e:
-                    logger.debug(f"Błąd parsowania JSON: {e}")
-                    continue
-    
-    # Próba znalezienia JSON bezpośrednio w całym tekście
     try:
-        logger.debug(f"Próba parsowania całego tekstu: {response_text.strip()}")
-        json_result = json.loads(response_text.strip())
-        logger.debug(f"Sparsowano JSON z całego tekstu: {json_result}")
-        if json_result is not None:
-            return json_result
-    except json.JSONDecodeError as e:
-        logger.debug(f"Błąd parsowania całego tekstu jako JSON: {e}")
-        logger.warning("Nie udało się wyciągnąć JSON z odpowiedzi")
+        # Użyj parsera JSON z fabryki
+        parser = ResponseParserFactory.get_parser("json")
+        result = parser.parse(response_text)
+        
+        if result:
+            return result
         return None
-    
-    return None
+        
+    except Exception as e:
+        logger.error(f"Błąd podczas parsowania JSON: {str(e)}")
+        return None
 
 def parse_llm_response(response: Dict[str, Any]) -> str:
     """

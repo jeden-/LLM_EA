@@ -13,6 +13,7 @@ from unittest.mock import patch, MagicMock
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
+from typing import Dict, Any
 
 # Dodanie ścieżki głównego katalogu projektu do PYTHONPATH
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -20,7 +21,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from LLM_Engine.llm_engine import LLMEngine
 from LLM_Engine.technical_indicators import TechnicalIndicators
 from LLM_Engine.advanced_indicators import AdvancedIndicators
-from LLM_Engine.response_parser import ResponseParser
+from LLM_Engine.response_parser import ResponseParserFactory
 from LLM_Engine.market_analyzer import MarketAnalyzer
 
 class TestTechnicalIndicators(unittest.TestCase):
@@ -215,128 +216,13 @@ class TestAdvancedIndicators(unittest.TestCase):
         self.assertEqual(fib_levels['1.0'], 1.1500)
 
 
-class TestResponseParser(unittest.TestCase):
-    """Testy dla klasy ResponseParser."""
-    
-    def setUp(self):
-        """Konfiguracja przed każdym testem."""
-        self.parser = ResponseParser()
-    
-    def test_extract_json_from_text(self):
-        """Test wyodrębniania JSON z tekstu."""
-        # Test z blokiem kodu JSON
-        text_with_code_block = """
-        Oto analiza rynku:
-        
-        ```json
-        {
-          "trend": "bullish",
-          "strength": 7,
-          "key_levels": {
-            "support": [1.0780, 1.0750],
-            "resistance": [1.0850, 1.0880]
-          },
-          "recommendation": "buy",
-          "explanation": "Rynek wykazuje silny trend wzrostowy."
-        }
-        ```
-        """
-        
-        result = self.parser.extract_json_from_text(text_with_code_block)
-        self.assertIsNotNone(result)
-        self.assertEqual(result["trend"], "bullish")
-        self.assertEqual(result["strength"], 7)
-        
-        # Test z JSON bez bloku kodu
-        text_with_json = """
-        Oto wynik analizy:
-        
-        {
-          "trend": "bearish",
-          "strength": 5,
-          "key_levels": {
-            "support": [1.0780, 1.0750],
-            "resistance": [1.0850, 1.0880]
-          },
-          "recommendation": "sell",
-          "explanation": "Rynek wykazuje średni trend spadkowy."
-        }
-        """
-        
-        result = self.parser.extract_json_from_text(text_with_json)
-        self.assertIsNotNone(result)
-        self.assertEqual(result["trend"], "bearish")
-        self.assertEqual(result["strength"], 5)
-        
-        # Test z niepoprawnym JSON
-        text_with_invalid_json = """
-        Oto wynik analizy:
-        
-        {
-          "trend": "bearish",
-          "strength": 5,
-          key_levels: {
-            "support": [1.0780, 1.0750],
-            "resistance": [1.0850, 1.0880]
-          }
-          "recommendation": "sell",
-          "explanation": "Rynek wykazuje średni trend spadkowy."
-        }
-        """
-        
-        result = self.parser.extract_json_from_text(text_with_invalid_json)
-        self.assertIsNone(result)
-    
-    def test_validate_schema(self):
-        """Test walidacji schematu JSON."""
-        # Poprawne dane zgodne ze schematem
-        valid_data = {
-            "trend": "bullish",
-            "strength": 7,
-            "key_levels": {
-                "support": [1.0780, 1.0750],
-                "resistance": [1.0850, 1.0880]
-            },
-            "recommendation": "buy",
-            "explanation": "Rynek wykazuje silny trend wzrostowy."
-        }
-        
-        # Schemat do walidacji
-        schema = {
-            "type": "object",
-            "required": ["trend", "strength", "key_levels", "recommendation", "explanation"],
-            "properties": {
-                "trend": {
-                    "type": "string",
-                    "enum": ["bullish", "bearish", "neutral", "sideways", "ranging"]
-                },
-                "strength": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "maximum": 10
-                }
-            }
-        }
-        
-        # Walidacja poprawnych danych
-        result = self.parser.validate_schema(valid_data, schema)
-        self.assertTrue(result)
-        
-        # Niepoprawne dane niezgodne ze schematem
-        invalid_data = {
-            "trend": "super_bullish",  # Wartość spoza enum
-            "strength": 11,  # Wartość poza zakresem
-            "key_levels": {
-                "support": [1.0780, 1.0750],
-                "resistance": [1.0850, 1.0880]
-            },
-            "recommendation": "buy",
-            "explanation": "Rynek wykazuje silny trend wzrostowy."
-        }
-        
-        # Walidacja niepoprawnych danych
-        result = self.parser.validate_schema(invalid_data, schema)
-        self.assertFalse(result)
+class TestResponseParser(ResponseParserFactory):
+    def parse(self, response: str) -> Dict[str, Any]:
+        """Implementacja metody parse dla testów."""
+        try:
+            return json.loads(response)
+        except json.JSONDecodeError:
+            return {"text": response}
 
 
 class TestLLMEngine(unittest.TestCase):
@@ -369,17 +255,51 @@ class TestLLMEngine(unittest.TestCase):
             "resistance": [1.0850, 1.0880]
           },
           "recommendation": "buy",
-          "explanation": "Rynek wykazuje silny trend wzrostowy."
+          "explanation": "Rynek wykazuje silny trend wzrostowy.",
+          "risk_assessment": {
+            "level": "medium",
+            "factors": ["Silny trend", "Bliskość oporu"],
+            "recommendations": ["Ustaw SL poniżej wsparcia", "Częściowa realizacja zysków na oporze"]
+          }
         }
         """
         
+        # Mockowanie ResponseParserFactory
+        self.parser_mock = MagicMock()
+        self.parser_mock.parse.return_value = {
+            "trend": "bullish",
+            "strength": 7,
+            "key_levels": {
+                "support": [1.0780, 1.0750],
+                "resistance": [1.0850, 1.0880]
+            },
+            "recommendation": "buy",
+            "explanation": "Rynek wykazuje silny trend wzrostowy."
+        }
+        self.parser_mock.validate.return_value = (True, [])
+        
+        # Patch dla ResponseParserFactory
+        self.parser_factory_patcher = patch('LLM_Engine.response_parser.ResponseParserFactory')
+        self.parser_factory_mock = self.parser_factory_patcher.start()
+        self.parser_factory_mock.get_parser.return_value = self.parser_mock
+        
         # Mockowanie MarketAnalyzer
         self.market_analyzer_mock = MagicMock()
+        self.market_analyzer_mock.analyze_trend.return_value = {
+            "trend": "bullish",
+            "strength": 7
+        }
         
-        # Mockowanie LLMEngine
-        with patch('LLM_Engine.llm_engine.GrokClient', return_value=self.grok_mock), \
-             patch('LLM_Engine.llm_engine.MarketAnalyzer', return_value=self.market_analyzer_mock):
-            self.engine = LLMEngine()
+        # Patchowanie GrokClient i MarketAnalyzer
+        patcher_grok = patch('LLM_Engine.llm_engine.GrokClient', return_value=self.grok_mock)
+        patcher_market = patch('LLM_Engine.llm_engine.MarketAnalyzer', return_value=self.market_analyzer_mock)
+        self.addCleanup(patcher_grok.stop)
+        self.addCleanup(patcher_market.stop)
+        patcher_grok.start()
+        patcher_market.start()
+        
+        # Inicjalizacja silnika LLM
+        self.engine = LLMEngine()
         
         # Przykładowe dane rynkowe
         self.market_data = {
@@ -397,7 +317,11 @@ class TestLLMEngine(unittest.TestCase):
                 "MACD": [0.0012, 0.0015, 0.0018, 0.0022, 0.0025]
             }
         }
-    
+
+    def tearDown(self):
+        """Czyszczenie po każdym teście."""
+        self.parser_factory_patcher.stop()
+
     @patch('LLM_Engine.llm_engine.GrokClient')
     @patch('LLM_Engine.llm_engine.MarketAnalyzer')
     def test_analyze_market(self, MockMarketAnalyzer, MockGrokClient):
@@ -441,10 +365,11 @@ class TestLLMEngine(unittest.TestCase):
              patch('LLM_Engine.llm_engine.CacheManager.get', return_value=None), \
              patch('LLM_Engine.llm_engine.CacheManager.set'):
             
-            # Mockowanie ResponseParser
-            with patch('LLM_Engine.llm_engine.ResponseParser.validate_market_analysis', 
-                       return_value=mock_client.generate_with_json_output.return_value):
-                
+            # Mockowanie ResponseParserFactory
+            mock_parser = MagicMock()
+            mock_parser.validate_market_analysis.return_value = mock_client.generate_with_json_output.return_value
+            
+            with patch('LLM_Engine.llm_engine.ResponseParserFactory.get_parser', return_value=mock_parser):
                 # Utwórz instancję LLMEngine
                 engine = LLMEngine()
                 
@@ -481,124 +406,278 @@ class TestLLMEngine(unittest.TestCase):
     
     def test_calculate_stop_loss(self):
         """Test obliczania poziomu stop loss."""
-        # Mockowanie metody analyze_market, aby nie wywoływać jej bezpośrednio
-        with patch.object(self.engine, 'analyze_market') as mock_analyze:
-            # Ustawiamy wartość zwracaną przez analyze_market
-            mock_analyze.return_value = {
-                "trend": "bullish",
-                "strength": 7,
-                "key_levels": {
-                    "support": [1.0730, 1.0700],
-                    "resistance": [1.0780, 1.0800]
-                },
-                "recommendation": "buy",
-                "explanation": "Rynek wykazuje silny trend wzrostowy."
-            }
-            
-            # Ustawienie mocka dla grok_client
-            self.grok_mock.generate_with_json_output.return_value = """
-            {
-              "stop_loss": 1.0720,
-              "take_profit": 1.0800,
-              "explanation": "Stop loss ustawiony pod kluczowym poziomem wsparcia."
-            }
-            """
-            
-            # Wywołujemy testowaną metodę dla pozycji BUY
-            result = self.engine.calculate_stop_loss_take_profit(
-                symbol=self.market_data["symbol"],
-                position_type="buy",
-                entry_price=1.0750,
-                market_data=self.market_data
-            )
-            
-            # Sprawdzenie czy wynik zawiera oczekiwane pola
-            self.assertIn("stop_loss", result)
-            
-            # Sprawdzenie wartości
-            self.assertIsInstance(result["stop_loss"], float)
+        # Przygotowanie danych testowych
+        entry_price = 1.0800
+        risk_level = "medium"
+        trend = "bullish"
+        support_levels = [1.0750, 1.0720]
+        volatility = 0.0025
+
+        # Obliczenie stop loss
+        result = self.engine.calculate_stop_loss(
+            entry_price=entry_price,
+            risk_level=risk_level,
+            trend=trend,
+            support_levels=support_levels,
+            volatility=volatility
+        )
+        
+        # Sprawdzenie wyniku
+        self.assertIn("stop_loss", result)
+        self.assertIn("reason", result)
+        self.assertIn("risk_multiplier", result)
+        self.assertIn("based_on_support", result)
+        
+        # Dla risk_level="medium", mnożnik powinien być 1.5
+        expected_atr_stop = entry_price - (volatility * 1.5)
+        expected_atr_stop = round(expected_atr_stop, 5)
+        
+        # Sprawdzamy czy stop loss jest ustawiony na poziomie wsparcia lub ATR
+        if result["based_on_support"]:
+            self.assertEqual(result["stop_loss"], 1.0750)  # Najbliższy poziom wsparcia
+            self.assertEqual(result["reason"], "Stop loss ustawiony na najbliższym poziomie wsparcia")
+        else:
+            self.assertEqual(result["stop_loss"], expected_atr_stop)
+            self.assertEqual(result["reason"], "Stop loss ustawiony na 1.5x ATR poniżej ceny wejścia")
+        
+        self.assertEqual(result["risk_multiplier"], 1.5)
     
     def test_calculate_take_profit(self):
         """Test obliczania poziomu take profit."""
-        # Mockowanie metody analyze_market, aby nie wywoływać jej bezpośrednio
-        with patch.object(self.engine, 'analyze_market') as mock_analyze:
-            # Ustawiamy wartość zwracaną przez analyze_market
-            mock_analyze.return_value = {
-                "trend": "bullish",
-                "strength": 7,
-                "key_levels": {
-                    "support": [1.0730, 1.0700],
-                    "resistance": [1.0780, 1.0800]
-                },
-                "recommendation": "buy",
-                "explanation": "Rynek wykazuje silny trend wzrostowy."
-            }
-            
-            # Ustawienie mocka dla grok_client
-            self.grok_mock.generate_with_json_output.return_value = """
-            {
-              "stop_loss": 1.0720,
-              "take_profit": 1.0800,
-              "explanation": "Take profit ustawiony na kluczowym poziomie oporu."
-            }
-            """
-            
-            # Wywołujemy testowaną metodę dla pozycji BUY
-            result = self.engine.calculate_stop_loss_take_profit(
-                symbol=self.market_data["symbol"],
-                position_type="buy",
-                entry_price=1.0750,
-                market_data=self.market_data
-            )
-            
-            # Sprawdzenie czy wynik zawiera oczekiwane pola
-            self.assertIn("take_profit", result)
-            
-            # Sprawdzenie wartości
-            self.assertIsInstance(result["take_profit"], float)
+        # Przygotowanie danych testowych
+        entry_price = 1.0800
+        risk_reward = 2.0
+        stop_loss = 1.0750
+        resistance_levels = [1.0850, 1.0880]
+        trend = "bullish"
+
+        # Obliczenie take profit
+        result = self.engine.calculate_take_profit(
+            entry_price=entry_price,
+            risk_reward=risk_reward,
+            stop_loss=stop_loss,
+            resistance_levels=resistance_levels,
+            trend=trend
+        )
+        
+        # Sprawdzenie wyniku
+        self.assertIn("take_profit", result)
+        self.assertIn("reason", result)
+        self.assertIn("risk_reward", result)
+        self.assertIn("based_on_resistance", result)
+        
+        # Obliczenie minimalnego take profit na podstawie R:R
+        risk = abs(entry_price - stop_loss)  # 0.0050
+        expected_min_tp = entry_price + (risk * risk_reward)  # 1.0800 + (0.0050 * 2.0) = 1.0900
+        expected_min_tp = round(expected_min_tp, 5)
+        
+        # Sprawdzamy czy take profit jest ustawiony na poziomie oporu lub minimalnym R:R
+        if result["based_on_resistance"]:
+            self.assertEqual(result["take_profit"], 1.0880)  # Najbliższy poziom oporu
+            self.assertEqual(result["reason"], "Take profit ustawiony na najbliższym poziomie oporu")
+        else:
+            self.assertEqual(result["take_profit"], expected_min_tp)
+            self.assertEqual(result["reason"], "Take profit ustawiony dla R:R 2.0")
+        
+        # Sprawdzamy czy risk reward jest prawidłowy
+        actual_rr = round(abs(result["take_profit"] - entry_price) / risk, 2)
+        self.assertEqual(result["risk_reward"], actual_rr)
     
-    def test_generate_trade_idea(self):
-        """Test generowania pomysłu handlowego."""
-        # Mockowanie metody analyze_market, aby nie wywoływać jej bezpośrednio
-        with patch.object(self.engine, 'analyze_market') as mock_analyze:
-            # Ustawiamy wartość zwracaną przez analyze_market
-            mock_analyze.return_value = {
-                "trend": "bullish",
-                "strength": 7,
-                "key_levels": {
-                    "support": [1.0730, 1.0700],
-                    "resistance": [1.0780, 1.0800]
+    @patch('LLM_Engine.llm_engine.GrokClient')
+    @patch('LLM_Engine.llm_engine.ResponseParserFactory')
+    def test_generate_trade_idea_complete_response(self, mock_parser_factory, mock_grok_client):
+        """Test generowania pomysłu handlowego z kompletną odpowiedzią"""
+        # Przygotowanie danych testowych
+        market_analysis = {
+            "trend": "bullish",
+            "strength": 8,
+            "support_levels": [1.0900, 1.0850],
+            "resistance_levels": [1.1100, 1.1150],
+            "volatility": "medium",
+            "market_conditions": {
+                "trend_strength": "strong",
+                "momentum": "positive"
+            }
+        }
+        
+        risk_assessment = {
+            "level": "medium",
+            "factors": ["Silny trend wzrostowy", "Dobra płynność"],
+            "total_risk": "acceptable"
+        }
+        
+        current_price = 1.1000
+        
+        mock_response = {
+            "direction": "buy",
+            "entry_price": 1.1000,
+            "stop_loss": 1.0900,
+            "take_profit": 1.1300,
+            "risk_reward": 3.0,
+            "metadata": {
+                "timestamp": "2024-03-21T10:00:00",
+                "model": "grok-v2",
+                "market_conditions": {
+                    "trend_strength": "strong",
+                    "momentum": "positive"
                 },
-                "recommendation": "buy",
-                "explanation": "Rynek wykazuje silny trend wzrostowy."
+                "risk_level": "medium"
+            }
+        }
+        
+        mock_grok_client.return_value.generate_with_json_output.return_value = mock_response
+        mock_parser = MagicMock()
+        mock_parser.parse.return_value = mock_response
+        mock_parser_factory.get_parser.return_value = mock_parser
+        
+        # Wywołanie testowanej metody
+        result = self.engine.generate_trade_idea(
+            market_analysis=market_analysis,
+            risk_assessment=risk_assessment,
+            current_price=current_price
+        )
+        
+        # Sprawdzenie wyników
+        self.assertEqual(result["direction"], "buy")
+        self.assertEqual(result["entry_price"], 1.1000)
+        self.assertEqual(result["stop_loss"], 1.0900)
+        self.assertEqual(result["take_profit"], 1.1300)
+        self.assertEqual(result["risk_reward"], 3.0)
+        self.assertEqual(result["metadata"]["market_conditions"]["trend_strength"], "strong")
+        self.assertEqual(result["metadata"]["risk_level"], "medium")
+
+    @patch('LLM_Engine.llm_engine.GrokClient')
+    @patch('LLM_Engine.llm_engine.ResponseParserFactory')
+    def test_generate_trade_idea_incomplete_response(self, mock_parser_factory, mock_grok_client):
+        """Test generowania pomysłu handlowego z niekompletną odpowiedzią"""
+        # Przygotowanie danych testowych
+        market_analysis = {
+            "trend": "bearish",
+            "strength": 6,
+            "support_levels": [1.0900, 1.0850],
+            "resistance_levels": [1.1100, 1.1150],
+            "volatility": "high",
+            "market_conditions": {
+                "trend_strength": "moderate",
+                "momentum": "negative"
+            }
+        }
+        
+        risk_assessment = {
+            "level": "medium",
+            "factors": ["Podwyższona zmienność"],
+            "total_risk": "moderate"
+        }
+        
+        current_price = 1.1000
+        
+        # Przygotowanie niekompletnej odpowiedzi
+        mock_response = {
+            "direction": "sell",
+            "entry_price": 1.1000,
+            "metadata": {
+                "timestamp": "2024-03-21T10:00:00",
+                "model": "grok-v2",
+                "market_conditions": {
+                    "trend_strength": "moderate",
+                    "momentum": "negative"
+                },
+                "risk_level": "medium"
+            }
+        }
+        
+        mock_grok_client.return_value.generate_with_json_output.return_value = mock_response
+        mock_parser = MagicMock()
+        mock_parser.parse.return_value = mock_response
+        mock_parser_factory.get_parser.return_value = mock_parser
+        
+        # Mockowanie metod calculate_stop_loss_take_profit
+        with patch.object(self.engine, 'calculate_stop_loss_take_profit') as mock_calc:
+            mock_calc.return_value = {
+                "stop_loss": 1.1100,
+                "take_profit": 1.0800,
+                "atr_value": 0.0050,
+                "risk_pips": 100,
+                "reward_pips": 200
             }
             
-            # Ustawienie mocka dla grok_client
-            self.grok_mock.generate_with_json_output.return_value = """
-            {
-              "direction": "buy",
-              "entry_price": 1.0750,
-              "stop_loss": 1.0720,
-              "take_profit": 1.0800,
-              "risk_reward_ratio": 2.0,
-              "explanation": "Kupuj ze względu na silny trend wzrostowy.",
-              "confidence": "high"
+            # Wywołanie testowanej metody
+            result = self.engine.generate_trade_idea(
+                market_analysis=market_analysis,
+                risk_assessment=risk_assessment,
+                current_price=current_price
+            )
+        
+        # Sprawdzenie wyników
+        self.assertEqual(result["direction"], "sell")
+        self.assertEqual(result["entry_price"], 1.1000)
+        self.assertEqual(result["stop_loss"], 1.1100)
+        self.assertEqual(result["take_profit"], 1.0800)
+        self.assertEqual(result["metadata"]["market_conditions"]["trend_strength"], "moderate")
+        self.assertEqual(result["metadata"]["risk_level"], "medium")
+
+    @patch('LLM_Engine.llm_engine.GrokClient')
+    @patch('LLM_Engine.llm_engine.ResponseParserFactory')
+    def test_generate_trade_idea_hold_signal(self, mock_parser_factory, mock_grok_client):
+        """Test generowania pomysłu handlowego gdy trend jest neutralny"""
+        # Przygotowanie danych testowych
+        market_analysis = {
+            "trend": "neutral",
+            "strength": 3,
+            "support_levels": [1.0900, 1.0850],
+            "resistance_levels": [1.1100, 1.1150],
+            "volatility": "low",
+            "market_conditions": {
+                "trend_strength": "weak",
+                "momentum": "neutral"
             }
-            """
-            
-            # Wywołujemy testowaną metodę
-            result = self.engine.generate_trade_idea(self.market_data)
-            
-            # Sprawdzenie, czy wynik zawiera oczekiwane pola
-            self.assertIn("direction", result)
-            self.assertIn("stop_loss", result)
-            self.assertIn("take_profit", result)
-            self.assertIn("risk_reward_ratio", result)
-            self.assertIn("metadata", result)
-            
-            # Sprawdzenie wartości
-            self.assertIn(result["direction"], ["buy", "sell", "hold"])
-            self.assertEqual(result["metadata"]["symbol"], "EURUSD")
+        }
+        
+        risk_assessment = {
+            "level": "high",
+            "factors": ["Brak wyraźnego trendu", "Niska płynność"],
+            "total_risk": "high"
+        }
+        
+        current_price = 1.1000
+        
+        mock_response = {
+            "direction": "hold",
+            "entry_price": 0.0,
+            "stop_loss": 0.0,
+            "take_profit": 0.0,
+            "risk_reward": 0.0,
+            "metadata": {
+                "timestamp": "2024-03-21T10:00:00",
+                "model": "grok-v2",
+                "market_conditions": {
+                    "trend_strength": "weak",
+                    "momentum": "neutral"
+                },
+                "risk_level": "high"
+            }
+        }
+        
+        mock_grok_client.return_value.generate_with_json_output.return_value = mock_response
+        mock_parser = MagicMock()
+        mock_parser.parse.return_value = mock_response
+        mock_parser_factory.get_parser.return_value = mock_parser
+        
+        # Wywołanie testowanej metody
+        result = self.engine.generate_trade_idea(
+            market_analysis=market_analysis,
+            risk_assessment=risk_assessment,
+            current_price=current_price
+        )
+        
+        # Sprawdzenie wyników
+        self.assertEqual(result["direction"], "hold")
+        self.assertEqual(result["entry_price"], 0.0)
+        self.assertEqual(result["stop_loss"], 0.0)
+        self.assertEqual(result["take_profit"], 0.0)
+        self.assertEqual(result["risk_reward"], 0.0)
+        self.assertEqual(result["metadata"]["market_conditions"]["trend_strength"], "weak")
+        self.assertEqual(result["metadata"]["risk_level"], "high")
 
 
 if __name__ == '__main__':

@@ -66,6 +66,10 @@ class DatabaseHandler:
         Returns:
             True, jeśli połączenie zostało nawiązane pomyślnie, False w przeciwnym razie
         """
+        # Jeśli połączenie już istnieje, zwróć True
+        if self.conn is not None and self.cursor is not None:
+            return True
+            
         try:
             self.conn = sqlite3.connect(self.db_path)
             # Włączenie obsługi klucza obcego
@@ -244,7 +248,7 @@ class DatabaseHandler:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 symbol TEXT NOT NULL,
                 timeframe TEXT NOT NULL,
-                timestamp TEXT NOT NULL,
+                timestamp TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 analysis_data TEXT NOT NULL,
                 created_at TEXT DEFAULT CURRENT_TIMESTAMP
             )
@@ -261,7 +265,7 @@ class DatabaseHandler:
                 stop_loss REAL,
                 take_profit REAL,
                 risk_reward REAL,
-                timestamp TEXT NOT NULL,
+                timestamp TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 status TEXT DEFAULT 'new',
                 created_at TEXT DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (analysis_id) REFERENCES market_analyses (id)
@@ -297,7 +301,7 @@ class DatabaseHandler:
                 level TEXT NOT NULL,
                 module TEXT NOT NULL,
                 message TEXT NOT NULL,
-                timestamp TEXT NOT NULL,
+                timestamp TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 created_at TEXT DEFAULT CURRENT_TIMESTAMP
             )
             ''')
@@ -309,9 +313,8 @@ class DatabaseHandler:
         except sqlite3.Error as e:
             logger.error(f"Błąd podczas inicjalizacji bazy danych: {e}")
             self.conn.rollback()
-            return False
-        finally:
             self.disconnect()
+            return False
     
     def insert_market_analysis(self, symbol: str, timeframe: str, analysis_data: Dict[str, Any]) -> int:
         """
@@ -325,20 +328,23 @@ class DatabaseHandler:
         Returns:
             ID zapisanego rekordu lub -1 w przypadku błędu
         """
-        if not self.connect():
-            return -1
-        
-        try:
-            timestamp = datetime.datetime.now().isoformat()
+        # Walidacja typów danych
+        if not isinstance(symbol, str):
+            raise TypeError("Symbol musi być typu string")
+        if not isinstance(timeframe, str):
+            raise TypeError("Timeframe musi być typu string")
+        if not isinstance(analysis_data, dict):
+            raise TypeError("Analysis data musi być słownikiem")
             
+        try:
             # Konwersja danych analizy do formatu JSON
             analysis_json = json.dumps(analysis_data, ensure_ascii=False)
             
             # Wstawienie rekordu
             self.cursor.execute('''
-            INSERT INTO market_analyses (symbol, timeframe, timestamp, analysis_data)
-            VALUES (?, ?, ?, ?)
-            ''', (symbol, timeframe, timestamp, analysis_json))
+            INSERT INTO market_analyses (symbol, timeframe, analysis_data)
+            VALUES (?, ?, ?)
+            ''', (symbol, timeframe, analysis_json))
             
             self.conn.commit()
             record_id = self.cursor.lastrowid
@@ -350,9 +356,7 @@ class DatabaseHandler:
             logger.error(f"Błąd podczas zapisywania analizy rynkowej: {e}")
             self.conn.rollback()
             return -1
-        finally:
-            self.disconnect()
-    
+
     def insert_trade_idea(self, analysis_id: int, symbol: str, direction: str,
                       entry_price: float, stop_loss: float, take_profit: float,
                       risk_reward: float) -> int:
@@ -371,17 +375,12 @@ class DatabaseHandler:
         Returns:
             ID zapisanego rekordu lub -1 w przypadku błędu
         """
-        if not self.connect():
-            return -1
-        
         try:
-            timestamp = datetime.datetime.now().isoformat()
-            
             # Wstawienie rekordu
             self.cursor.execute('''
-            INSERT INTO trade_ideas (analysis_id, symbol, direction, entry_price, stop_loss, take_profit, risk_reward, timestamp)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (analysis_id, symbol, direction, entry_price, stop_loss, take_profit, risk_reward, timestamp))
+            INSERT INTO trade_ideas (analysis_id, symbol, direction, entry_price, stop_loss, take_profit, risk_reward)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            ''', (analysis_id, symbol, direction, entry_price, stop_loss, take_profit, risk_reward))
             
             self.conn.commit()
             record_id = self.cursor.lastrowid
@@ -393,9 +392,7 @@ class DatabaseHandler:
             logger.error(f"Błąd podczas zapisywania idei handlowej: {e}")
             self.conn.rollback()
             return -1
-        finally:
-            self.disconnect()
-    
+
     def insert_trade(self, trade_idea_id: int, symbol: str, direction: str, 
                  entry_price: float, entry_time: str, stop_loss: float,
                  take_profit: float, volume: float, comment: str = None) -> int:
@@ -436,85 +433,36 @@ class DatabaseHandler:
             logger.error(f"Błąd podczas zapisywania transakcji: {e}")
             self.conn.rollback()
             return -1
-        finally:
-            self.disconnect()
-    
-    def update_trade(self, trade_id: int, exit_price: float, exit_time: str, 
-                 profit_loss: float, status: str) -> bool:
-        """
-        Aktualizacja transakcji (zamknięcie).
-        
-        Args:
-            trade_id: ID transakcji
-            exit_price: Cena wyjścia
-            exit_time: Czas wyjścia
-            profit_loss: Zysk/strata
-            status: Status transakcji (closed, stopped, tp_hit)
-            
-        Returns:
-            True, jeśli aktualizacja przebiegła pomyślnie, False w przeciwnym razie
-        """
-        if not self.connect():
-            return False
-        
-        try:
-            # Aktualizacja rekordu
-            self.cursor.execute('''
-            UPDATE trades
-            SET exit_price = ?, exit_time = ?, profit_loss = ?, status = ?
-            WHERE id = ?
-            ''', (exit_price, exit_time, profit_loss, status, trade_id))
-            
-            if self.cursor.rowcount == 0:
-                logger.warning(f"Nie znaleziono transakcji o ID {trade_id}")
-                return False
-            
-            self.conn.commit()
-            logger.info(f"Zaktualizowano transakcję o ID {trade_id}, status: {status}")
-            return True
-            
-        except sqlite3.Error as e:
-            logger.error(f"Błąd podczas aktualizacji transakcji: {e}")
-            self.conn.rollback()
-            return False
-        finally:
-            self.disconnect()
-    
+
     def insert_log(self, level: str, module: str, message: str) -> int:
         """
-        Zapisanie logu systemowego do bazy danych.
+        Zapisanie logu do bazy danych.
         
         Args:
-            level: Poziom logu (info, warning, error, critical)
+            level: Poziom logu (INFO, WARNING, ERROR, etc.)
             module: Nazwa modułu
-            message: Treść komunikatu
+            message: Treść wiadomości
             
         Returns:
             ID zapisanego rekordu lub -1 w przypadku błędu
         """
-        if not self.connect():
-            return -1
-        
         try:
-            timestamp = datetime.datetime.now().isoformat()
-            
             # Wstawienie rekordu
             self.cursor.execute('''
-            INSERT INTO system_logs (level, module, message, timestamp)
-            VALUES (?, ?, ?, ?)
-            ''', (level, module, message, timestamp))
+            INSERT INTO system_logs (level, module, message)
+            VALUES (?, ?, ?)
+            ''', (level, module, message))
             
             self.conn.commit()
             record_id = self.cursor.lastrowid
             
+            logger.info(f"Zapisano log: {level} - {module} - {message}")
             return record_id
             
         except sqlite3.Error as e:
             logger.error(f"Błąd podczas zapisywania logu: {e}")
             self.conn.rollback()
             return -1
-        finally:
-            self.disconnect()
     
     def get_latest_analyses(self, symbol: Optional[str] = None, limit: int = 10) -> List[Dict[str, Any]]:
         """
@@ -1360,6 +1308,46 @@ class DatabaseHandler:
             return -1
         finally:
             self.disconnect()
+
+    def update_trade(self, trade_id: int, update_data: Dict[str, Any]) -> bool:
+        """
+        Aktualizuje dane transakcji w bazie danych.
+        
+        Args:
+            trade_id: ID transakcji do aktualizacji
+            update_data: Słownik z danymi do aktualizacji
+            
+        Returns:
+            bool: True jeśli aktualizacja się powiodła, False w przeciwnym razie
+        """
+        if not self.connect():
+            return False
+        
+        try:
+            # Przygotuj zapytanie SQL
+            set_clause = ", ".join([f"{key} = ?" for key in update_data.keys()])
+            values = list(update_data.values())
+            values.append(trade_id)  # Dla warunku WHERE
+            
+            self.cursor.execute(f'''
+                UPDATE trades 
+                SET {set_clause}
+                WHERE id = ?
+            ''', values)
+            
+            # Sprawdź, czy rekord został zaktualizowany
+            if self.cursor.rowcount == 0:
+                logger.warning(f"Nie znaleziono transakcji o ID: {trade_id}")
+                return False
+                
+            self.conn.commit()
+            logger.info(f"Zaktualizowano transakcję o ID: {trade_id}")
+            return True
+            
+        except sqlite3.Error as e:
+            logger.error(f"Błąd podczas aktualizacji transakcji: {e}")
+            self.conn.rollback()
+            return False
 
 
 if __name__ == "__main__":

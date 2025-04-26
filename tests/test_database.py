@@ -9,9 +9,10 @@ Pozwala na weryfikację poprawności działania klasy DatabaseHandler.
 import os
 import sys
 import logging
-import datetime
+from datetime import datetime
 import sqlite3
 from pathlib import Path
+import unittest
 
 # Dodajemy główny katalog projektu do ścieżki importów
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -24,440 +25,390 @@ logging.basicConfig(level=logging.INFO,
                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-class TestDatabaseHandler(DatabaseHandler):
-    """
-    Rozszerzona klasa DatabaseHandler do testów - utrzymuje połączenie dla bazy w pamięci.
-    """
+class TestDatabaseHandler(unittest.TestCase):
+    """Klasa testowa dla obsługi bazy danych."""
     
-    def __init__(self, db_path=":memory:", auto_init=True):
-        """
-        Inicjalizacja handlera testowej bazy danych.
+    def setUp(self):
+        """Przygotowanie środowiska testowego."""
+        # Używamy bazy danych w pamięci dla testów
+        self.db = DatabaseHandler(":memory:", auto_init=False)
+        self.assertTrue(self.db.connect())
+        self.assertTrue(self.db.init_database())
+        # Nie rozłączamy się po inicjalizacji
+
+    def tearDown(self):
+        """Sprzątanie po testach."""
+        if hasattr(self, 'db'):
+            self.db.disconnect()
+
+    def test_database_structure(self):
+        """Test sprawdzający czy wszystkie wymagane tabele zostały utworzone."""
+        required_tables = [
+            'market_analyses',
+            'trade_ideas',
+            'trades',
+            'system_logs'
+        ]
         
-        Args:
-            db_path: Ścieżka do pliku bazy danych (domyślnie: ":memory:")
-            auto_init: Czy automatycznie inicjalizować bazę danych
-        """
-        super().__init__(db_path=db_path, auto_init=False)
+        self.db.connect()
+        self.cursor = self.db.cursor
         
-        # Utrzymujemy stałe połączenie dla bazy w pamięci
-        self.conn = sqlite3.connect(self.db_path)
-        self.conn.execute("PRAGMA foreign_keys = ON")
-        self.conn.row_factory = sqlite3.Row
-        self.cursor = self.conn.cursor()
+        # Pobierz listę wszystkich tabel
+        self.cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        existing_tables = [row[0] for row in self.cursor.fetchall()]
         
-        # Inicjalizacja bazy danych
-        if auto_init:
-            self.init_database_internal()
-    
-    def connect(self) -> bool:
-        """
-        W testach nie łączymy się ponownie, bo utrzymujemy stałe połączenie.
-        
-        Returns:
-            True, połączenie jest już nawiązane
-        """
-        return True
-    
-    def disconnect(self):
-        """W testach nie rozłączamy się, aby utrzymać bazę w pamięci."""
-        pass
-    
-    def init_database_internal(self) -> bool:
-        """
-        Wewnętrzna metoda inicjalizacji struktury bazy danych (bez connect/disconnect).
-        
-        Returns:
-            True, jeśli inicjalizacja przebiegła pomyślnie, False w przeciwnym razie
-        """
-        try:
-            # Tabela z analizami rynkowymi
-            self.cursor.execute('''
-            CREATE TABLE IF NOT EXISTS market_analyses (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                symbol TEXT NOT NULL,
-                timeframe TEXT NOT NULL,
-                timestamp TEXT NOT NULL,
-                analysis_data TEXT NOT NULL,
-                created_at TEXT DEFAULT CURRENT_TIMESTAMP
-            )
-            ''')
+        # Sprawdź czy wszystkie wymagane tabele istnieją
+        for table in required_tables:
+            self.assertIn(table, existing_tables, f"Brak wymaganej tabeli: {table}")
             
-            # Tabela z pomysłami handlowymi (trade ideas)
-            self.cursor.execute('''
-            CREATE TABLE IF NOT EXISTS trade_ideas (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                analysis_id INTEGER,
-                symbol TEXT NOT NULL,
-                direction TEXT NOT NULL,
-                entry_price REAL,
-                stop_loss REAL,
-                take_profit REAL,
-                risk_reward REAL,
-                timestamp TEXT NOT NULL,
-                status TEXT DEFAULT 'new',
-                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (analysis_id) REFERENCES market_analyses (id)
-            )
-            ''')
-            
-            # Tabela z transakcjami (trades)
-            self.cursor.execute('''
-            CREATE TABLE IF NOT EXISTS trades (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                trade_idea_id INTEGER,
-                symbol TEXT NOT NULL,
-                direction TEXT NOT NULL,
-                entry_price REAL NOT NULL,
-                entry_time TEXT NOT NULL,
-                exit_price REAL,
-                exit_time TEXT,
-                stop_loss REAL,
-                take_profit REAL,
-                profit_loss REAL,
-                status TEXT NOT NULL,
-                volume REAL NOT NULL,
-                comment TEXT,
-                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (trade_idea_id) REFERENCES trade_ideas (id)
-            )
-            ''')
-            
-            # Tabela z logami systemu
-            self.cursor.execute('''
-            CREATE TABLE IF NOT EXISTS system_logs (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                level TEXT NOT NULL,
-                module TEXT NOT NULL,
-                message TEXT NOT NULL,
-                timestamp TEXT NOT NULL,
-                created_at TEXT DEFAULT CURRENT_TIMESTAMP
-            )
-            ''')
-            
-            self.conn.commit()
-            logger.info("Struktura bazy danych została zainicjalizowana")
-            return True
-            
-        except sqlite3.Error as e:
-            logger.error(f"Błąd podczas inicjalizacji bazy danych: {e}")
-            self.conn.rollback()
-            return False
-    
-    def init_database(self) -> bool:
-        """
-        Przesłania metodę bazową, używając wewnętrznej metody inicjalizacji.
-        
-        Returns:
-            True, jeśli inicjalizacja przebiegła pomyślnie, False w przeciwnym razie
-        """
-        return self.init_database_internal()
-    
-    def __del__(self):
-        """
-        Destruktor - zamyka połączenie z bazą danych.
-        """
-        if self.conn:
-            self.conn.close()
+        # Sprawdź strukturę tabel
+        self.cursor.execute("PRAGMA table_info(market_analyses)")
+        columns = {row[1] for row in self.cursor.fetchall()}
+        required_columns = {'id', 'symbol', 'timeframe', 'timestamp', 'analysis_data', 'created_at'}
+        self.assertTrue(required_columns.issubset(columns), 
+                       f"Brak wymaganych kolumn w tabeli market_analyses: {required_columns - columns}")
 
-def test_database_init():
-    """Test inicjalizacji bazy danych."""
-    print("  - Testowanie inicjalizacji bazy danych")
-    db_handler = TestDatabaseHandler()
-    result = db_handler.init_database_internal()
-    print(f"  - Inicjalizacja bazy danych: {result}")
-    return result
+    def test_connection(self):
+        """Test połączenia z bazą danych."""
+        self.assertTrue(self.db.connect())
+        self.assertIsNotNone(self.db.conn)
+        self.assertIsNotNone(self.db.cursor)
 
-def test_market_analysis():
-    """Test zapisywania i odczytu analizy rynkowej."""
-    print("  - Testowanie zapisywania i odczytu analizy rynkowej")
-    db_handler = TestDatabaseHandler()
-    db_handler.init_database_internal()
-    
-    # Dane testowe
-    symbol = "EURUSD"
-    timeframe = "H1"
-    analysis_data = {
-        "trend": "bullish",
-        "trend_strength": 7,
-        "support_levels": [1.0800, 1.0750],
-        "resistance_levels": [1.0900, 1.0950],
-        "volatility": "medium",
-        "momentum": "increasing",
-        "timestamp": "2023-10-15 12:00:00"
-    }
-    
-    # Zapisz analizę
-    insert_success = db_handler.insert_market_analysis(symbol, timeframe, analysis_data)
-    print(f"  - Zapisanie analizy: {insert_success}")
-    
-    # Pobierz analizę
-    analyses = db_handler.get_latest_analyses(symbol, limit=1)
-    print(f"  - Pobrano analiz: {len(analyses)}")
-    
-    success = insert_success and len(analyses) > 0
-    
-    if success:
-        analysis = analyses[0]
-        print(f"  - Pobrano analizę: {analysis['symbol']} {analysis['timestamp']} ({analysis['analysis_data']['trend']})")
-    
-    return success
-
-def test_trade_idea():
-    """Test zapisywania i odczytu pomysłów handlowych."""
-    print("  - Testowanie zapisywania i odczytu pomysłów handlowych")
-    db_handler = TestDatabaseHandler()
-    db_handler.init_database_internal()
-    
-    # Najpierw dodajemy analizę, żeby mieć analysis_id
-    symbol = "EURUSD"
-    timeframe = "H1"
-    analysis_data = {
-        "trend": "bullish",
-        "trend_strength": 7,
-        "support_levels": [1.0800, 1.0750],
-        "resistance_levels": [1.0900, 1.0950],
-        "volatility": "medium",
-        "momentum": "increasing",
-        "timestamp": "2023-10-15 12:00:00"
-    }
-    
-    analysis_id = db_handler.insert_market_analysis(symbol, timeframe, analysis_data)
-    
-    # Dane testowe dla pomysłu handlowego
-    direction = "buy"
-    entry_price = 1.0850
-    stop_loss = 1.0800
-    take_profit = 1.0950
-    risk_reward = 2.0
-    
-    # Zapisz pomysł handlowy
-    insert_success = db_handler.insert_trade_idea(analysis_id, symbol, direction, entry_price, stop_loss, take_profit, risk_reward)
-    print(f"  - Zapisanie pomysłu handlowego: {insert_success}")
-    
-    # Pobierz pomysły handlowe
-    ideas = db_handler.get_trade_ideas("EURUSD", limit=1)
-    print(f"  - Pobrano pomysłów handlowych: {len(ideas)}")
-    
-    success = insert_success > 0 and len(ideas) > 0
-    
-    if success:
-        idea = ideas[0]
-        print(f"  - Pobrano pomysł: {idea['symbol']} {idea['timestamp']} ({idea['direction']})")
-    
-    return success
-
-def test_trade():
-    """Test zapisywania i odczytu transakcji."""
-    print("  - Testowanie zapisywania i odczytu transakcji")
-    db_handler = TestDatabaseHandler()
-    db_handler.init_database_internal()
-    
-    # Najpierw dodajemy analizę i pomysł handlowy
-    symbol = "EURUSD"
-    timeframe = "H1"
-    analysis_data = {
-        "trend": "bullish",
-        "trend_strength": 7,
-        "support_levels": [1.0800, 1.0750],
-        "resistance_levels": [1.0900, 1.0950],
-        "volatility": "medium",
-        "momentum": "increasing"
-    }
-    
-    analysis_id = db_handler.insert_market_analysis(symbol, timeframe, analysis_data)
-    
-    # Dodajemy pomysł handlowy
-    direction = "buy"
-    entry_price = 1.0850
-    stop_loss = 1.0800
-    take_profit = 1.0950
-    risk_reward = 2.0
-    
-    trade_idea_id = db_handler.insert_trade_idea(analysis_id, symbol, direction, entry_price, stop_loss, take_profit, risk_reward)
-    
-    # Dane testowe dla transakcji
-    entry_time = "2023-10-15 12:00:00"
-    volume = 0.1
-    comment = "Test transaction"
-    
-    # Zapisz transakcję
-    insert_success = db_handler.insert_trade(trade_idea_id, symbol, direction, entry_price, entry_time, stop_loss, take_profit, volume, comment)
-    print(f"  - Zapisanie transakcji: {insert_success}")
-    
-    # Pobierz transakcje
-    trades = db_handler.get_trades("EURUSD", limit=1)
-    print(f"  - Pobrano transakcji: {len(trades)}")
-    
-    success = insert_success > 0 and len(trades) > 0
-    
-    if success:
-        trade = trades[0]
-        print(f"  - Pobrano transakcję: {trade['id']} {trade['symbol']} ({trade['status']})")
-    
-    return success
-
-def test_logs():
-    """Test zapisywania i odczytu logów systemowych."""
-    print("  - Testowanie zapisywania i odczytu logów")
-    db_handler = TestDatabaseHandler()
-    db_handler.init_database_internal()
-    
-    # Dane testowe
-    level = "INFO"
-    module = "LLM_Engine"
-    message = "Test message"
-    
-    # Zapisz log
-    insert_success = db_handler.insert_log(level, module, message)
-    print(f"  - Zapisanie logu: {insert_success}")
-    
-    # Pobierz logi
-    logs = db_handler.get_logs(level="INFO", module="LLM_Engine", limit=1)
-    print(f"  - Pobrano logów: {len(logs)}")
-    
-    success = insert_success > 0 and len(logs) > 0
-    
-    if success:
-        log = logs[0]
-        print(f"  - Pobrano log: {log['timestamp']} {log['level']} ({log['module']})")
-    
-    return success
-
-def test_statistics():
-    """Test pobierania statystyk handlowych."""
-    print("  - Testowanie pobierania statystyk")
-    db_handler = TestDatabaseHandler()
-    db_handler.init_database_internal()
-    
-    # Najpierw dodajemy kilka analiz i pomysłów handlowych
-    symbol = "EURUSD"
-    timeframe = "H1"
-    analysis_data = {
-        "trend": "bullish",
-        "trend_strength": 7,
-        "support_levels": [1.0800, 1.0750],
-        "resistance_levels": [1.0900, 1.0950],
-        "volatility": "medium",
-        "momentum": "increasing"
-    }
-    
-    analysis_id = db_handler.insert_market_analysis(symbol, timeframe, analysis_data)
-    
-    # Dodajemy pomysł handlowy
-    direction = "buy"
-    entry_price = 1.0850
-    stop_loss = 1.0800
-    take_profit = 1.0950
-    risk_reward = 2.0
-    
-    trade_idea_id = db_handler.insert_trade_idea(analysis_id, symbol, direction, entry_price, stop_loss, take_profit, risk_reward)
-    
-    # Dane transakcji
-    trades_data = [
-        {
-            "trade_idea_id": trade_idea_id,
-            "symbol": "EURUSD",
-            "direction": "buy",
-            "entry_price": 1.0800,
-            "entry_time": "2023-10-01 10:00:00",
-            "stop_loss": 1.0750,
-            "take_profit": 1.0900,
-            "volume": 0.1,
-            "comment": "Test trade 1"
-        },
-        {
-            "trade_idea_id": trade_idea_id,
-            "symbol": "EURUSD",
-            "direction": "sell",
-            "entry_price": 1.0850,
-            "entry_time": "2023-10-02 10:00:00",
-            "stop_loss": 1.0900,
-            "take_profit": 1.0750,
-            "volume": 0.1,
-            "comment": "Test trade 2"
-        },
-        {
-            "trade_idea_id": trade_idea_id,
-            "symbol": "EURUSD",
-            "direction": "buy",
-            "entry_price": 1.0750,
-            "entry_time": "2023-10-03 10:00:00",
-            "stop_loss": 1.0700,
-            "take_profit": 1.0850,
-            "volume": 0.1,
-            "comment": "Test trade 3"
-        }
-    ]
-    
-    # Zapisz wszystkie transakcje
-    trade_ids = []
-    for trade_data in trades_data:
-        trade_id = db_handler.insert_trade(
-            trade_data["trade_idea_id"], 
-            trade_data["symbol"], 
-            trade_data["direction"],
-            trade_data["entry_price"], 
-            trade_data["entry_time"], 
-            trade_data["stop_loss"],
-            trade_data["take_profit"], 
-            trade_data["volume"], 
-            trade_data["comment"]
+    def test_market_analysis(self):
+        """Test zapisu i odczytu analizy rynkowej."""
+        # Zapis analizy
+        analysis_id = self.db.insert_market_analysis(
+            symbol='EURUSD',
+            timeframe='H1',
+            analysis_data={
+                'trend': 'bullish',
+                'strength': 0.8
+            }
         )
-        trade_ids.append(trade_id)
-    
-    # Aktualizujemy transakcje, aby miały status zamknięty
-    db_handler.update_trade(trade_ids[0], 1.0850, "2023-10-01 14:00:00", 50.0, "closed")
-    db_handler.update_trade(trade_ids[1], 1.0800, "2023-10-02 16:00:00", 50.0, "closed")
-    db_handler.update_trade(trade_ids[2], 1.0700, "2023-10-03 12:00:00", -50.0, "closed")
-    
-    print("  - Zapisano testowe transakcje do statystyk")
-    
-    # Pobierz statystyki
-    stats = db_handler.get_statistics()
-    
-    if stats:
-        print(f"  - Statystyki: Zyskowność: {stats.get('win_rate', 'N/A')}%, Średni zysk: {stats.get('avg_profit_loss', 'N/A')}")
-    
-    # Sprawdź, czy statystyki zawierają dane
-    success = stats is not None
-    
-    return success
+        self.assertGreater(analysis_id, 0)
+        
+        # Odczyt analizy
+        results = self.db.get_latest_analyses(symbol='EURUSD', limit=1)
+        self.assertEqual(len(results), 1)
+        result = results[0]
+        self.assertEqual(result['symbol'], 'EURUSD')
+        self.assertEqual(result['analysis_data']['trend'], 'bullish')
+        self.assertEqual(result['analysis_data']['strength'], 0.8)
 
-def run_all_tests():
-    """Uruchomienie wszystkich testów."""
-    print("\n===== TESTY MODUŁU DATABASE =====\n")
-    
-    tests = [
-        test_database_init,
-        test_market_analysis,
-        test_trade_idea,
-        test_trade,
-        test_logs,
-        test_statistics
-    ]
-    
-    success_count = 0
-    total_count = len(tests)
-    
-    for test_func in tests:
-        print(f"\n>> Uruchamianie testu: {test_func.__name__}")
+    def test_trade_idea(self):
+        """Test zapisu i odczytu pomysłu na handel."""
+        # Najpierw zapisujemy analizę
+        analysis_id = self.db.insert_market_analysis(
+            symbol='EURUSD',
+            timeframe='H1',
+            analysis_data={'trend': 'bullish'}
+        )
+        
+        # Zapis pomysłu handlowego
+        idea_id = self.db.insert_trade_idea(
+            analysis_id=analysis_id,
+            symbol='EURUSD',
+            direction='buy',
+            entry_price=1.1000,
+            stop_loss=1.0950,
+            take_profit=1.1100,
+            risk_reward=2.0
+        )
+        self.assertGreater(idea_id, 0)
+        
+        # Odczyt pomysłu
+        results = self.db.get_trade_ideas(symbol='EURUSD')
+        self.assertGreater(len(results), 0)
+        result = results[0]
+        self.assertEqual(result['direction'], 'buy')
+        self.assertEqual(result['entry_price'], 1.1000)
+
+    def test_trade(self):
+        """Test zapisu i odczytu transakcji."""
+        # Najpierw zapisujemy analizę i pomysł handlowy
+        analysis_id = self.db.insert_market_analysis(
+            symbol='EURUSD',
+            timeframe='H1',
+            analysis_data={'trend': 'bullish'}
+        )
+        idea_id = self.db.insert_trade_idea(
+            analysis_id=analysis_id,
+            symbol='EURUSD',
+            direction='buy',
+            entry_price=1.1000,
+            stop_loss=1.0950,
+            take_profit=1.1100,
+            risk_reward=2.0
+        )
+        
+        # Zapis transakcji
+        trade_id = self.db.insert_trade(
+            trade_idea_id=idea_id,
+            symbol='EURUSD',
+            direction='buy',
+            entry_price=1.1000,
+            entry_time=datetime.now().isoformat(),
+            stop_loss=1.0950,
+            take_profit=1.1100,
+            volume=0.1,
+            comment='Test trade'
+        )
+        self.assertGreater(trade_id, 0)
+        
+        # Odczyt transakcji
+        results = self.db.get_trades(symbol='EURUSD')
+        self.assertGreater(len(results), 0)
+        result = results[0]
+        self.assertEqual(result['direction'], 'buy')
+        self.assertEqual(result['entry_price'], 1.1000)
+
+    def test_logs(self):
+        """Test zapisu i odczytu logów."""
+        # Zapis logu
+        log_id = self.db.insert_log(
+            level='INFO',
+            module='test',
+            message='Test log'
+        )
+        self.assertGreater(log_id, 0)
+        
+        # Odczyt logów
+        results = self.db.get_logs(limit=1)
+        self.assertEqual(len(results), 1)
+        result = results[0]
+        self.assertEqual(result['level'], 'INFO')
+        self.assertEqual(result['module'], 'test')
+        self.assertEqual(result['message'], 'Test log')
+
+    def test_statistics(self):
+        """Test pobierania statystyk."""
+        # Najpierw dodajemy kilka transakcji
+        analysis_id = self.db.insert_market_analysis(
+            symbol='EURUSD',
+            timeframe='H1',
+            analysis_data={'trend': 'bullish'}
+        )
+        idea_id = self.db.insert_trade_idea(
+            analysis_id=analysis_id,
+            symbol='EURUSD',
+            direction='buy',
+            entry_price=1.1000,
+            stop_loss=1.0950,
+            take_profit=1.1100,
+            risk_reward=2.0
+        )
+
+        # Dodajemy kilka transakcji
+        for i in range(3):
+            self.db.insert_trade(
+                trade_idea_id=idea_id,
+                symbol='EURUSD',
+                direction='buy',
+                entry_price=1.1000,
+                entry_time=datetime.now().isoformat(),
+                stop_loss=1.0950,
+                take_profit=1.1100,
+                volume=0.1,
+                comment=f'Test trade {i}'
+            )
+
+        # Pobieramy statystyki
+        stats = self.db.get_statistics()
+        self.assertIsInstance(stats, dict)
+        self.assertIn('total_trades', stats)
+        self.assertEqual(stats['total_trades'], 3)
+
+    def test_error_handling(self):
+        """Test obsługi błędów."""
+        # Test błędu połączenia
+        invalid_db = DatabaseHandler("invalid/path/db.sqlite", auto_init=False)
+        self.assertFalse(invalid_db.connect())
+        
+        # Test błędu wstawiania nieprawidłowych danych
+        with self.assertRaises(sqlite3.Error):
+            self.db.cursor.execute("INSERT INTO invalid_table (col) VALUES (?)", (1,))
+            
+        # Test błędu przy nieprawidłowym typie danych
+        with self.assertRaises(TypeError):
+            self.db.insert_market_analysis(
+                symbol=123,  # powinien być string
+                timeframe="H1",
+                analysis_data={"trend": "bullish"}
+            )
+            
+        # Test błędu przy braku wymaganych danych
+        with self.assertRaises(sqlite3.Error):
+            self.db.cursor.execute("INSERT INTO market_analyses (symbol) VALUES (?)", ("EURUSD",))
+            
+        # Test rollbacku przy błędzie
+        self.db.connect()
         try:
-            result = test_func()
-            print(f"   Wynik: {'POMYŚLNY ✅' if result else 'NIEPOMYŚLNY ❌'}")
-            if result:
-                success_count += 1
-        except Exception as e:
-            print(f"   Nieoczekiwany błąd: {str(e)}")
-            logger.error(f"❌ Nieoczekiwany błąd w teście {test_func.__name__}: {str(e)}")
-    
-    print(f"\n===== PODSUMOWANIE TESTÓW =====")
-    print(f"Przeprowadzono testów: {total_count}")
-    print(f"Pomyślnych testów: {success_count}")
-    print(f"Niepomyślnych testów: {total_count - success_count}")
-    print(f"Wynik: {'✅ POMYŚLNY' if success_count == total_count else '❌ NIEPOMYŚLNY'}")
-    
-    return success_count == total_count
+            self.db.cursor.execute("INSERT INTO invalid_table VALUES (1)")
+        except sqlite3.Error:
+            pass
+        # Sprawdzamy czy połączenie jest nadal aktywne
+        self.assertIsNotNone(self.db.conn)
 
-if __name__ == "__main__":
-    success = run_all_tests()
-    sys.exit(0 if success else 1) 
+    def test_edge_cases(self):
+        """Test przypadków skrajnych."""
+        # Test pustych wartości
+        analysis_id = self.db.insert_market_analysis(
+            symbol="",
+            timeframe="",
+            analysis_data={}
+        )
+        self.assertGreater(analysis_id, 0)
+        
+        # Test bardzo długich wartości
+        long_string = "x" * 1000
+        log_id = self.db.insert_log(
+            level="INFO",
+            module="test",
+            message=long_string
+        )
+        self.assertGreater(log_id, 0)
+        
+        # Test specjalnych znaków w danych
+        special_chars = "!@#$%^&*()_+{}[]|\\:;\"'<>,.?/~`"
+        analysis_id = self.db.insert_market_analysis(
+            symbol="EURUSD",
+            timeframe="H1",
+            analysis_data={"comment": special_chars}
+        )
+        self.assertGreater(analysis_id, 0)
+        
+        # Test wartości granicznych
+        idea_id = self.db.insert_trade_idea(
+            analysis_id=analysis_id,
+            symbol="EURUSD",
+            direction="buy",
+            entry_price=sys.float_info.max,
+            stop_loss=sys.float_info.min,
+            take_profit=sys.float_info.max,
+            risk_reward=sys.float_info.max
+        )
+        self.assertGreater(idea_id, 0)
+
+    def test_concurrent_access(self):
+        """Test współbieżnego dostępu do bazy danych."""
+        import threading
+        import queue
+        
+        results = queue.Queue()
+        errors = queue.Queue()
+        
+        def worker(worker_id):
+            try:
+                # Każdy wątek tworzy własne połączenie
+                db = DatabaseHandler(":memory:", auto_init=True)
+                db.connect()
+                
+                # Wykonaj operacje na bazie
+                analysis_id = db.insert_market_analysis(
+                    symbol=f"EURUSD_{worker_id}",
+                    timeframe="H1",
+                    analysis_data={"worker": worker_id}
+                )
+                
+                idea_id = db.insert_trade_idea(
+                    analysis_id=analysis_id,
+                    symbol=f"EURUSD_{worker_id}",
+                    direction="buy",
+                    entry_price=1.1000,
+                    stop_loss=1.0950,
+                    take_profit=1.1100,
+                    risk_reward=2.0
+                )
+                
+                results.put((worker_id, analysis_id, idea_id))
+                db.disconnect()
+                
+            except Exception as e:
+                errors.put((worker_id, str(e)))
+        
+        # Uruchom 5 wątków jednocześnie
+        threads = []
+        for i in range(5):
+            t = threading.Thread(target=worker, args=(i,))
+            threads.append(t)
+            t.start()
+        
+        # Poczekaj na zakończenie wszystkich wątków
+        for t in threads:
+            t.join()
+        
+        # Sprawdź czy nie było błędów
+        self.assertTrue(errors.empty(), f"Wystąpiły błędy: {list(errors.queue)}")
+        
+        # Sprawdź czy wszystkie operacje się powiodły
+        self.assertEqual(results.qsize(), 5, "Nie wszystkie operacje zostały wykonane")
+
+    def test_update_trade_success(self):
+        """Test aktualizacji danych transakcji."""
+        # Najpierw dodaj transakcję
+        trade_id = self.db.insert_trade(
+            trade_idea_id=None,
+            symbol='EURUSD',
+            direction='BUY',
+            entry_price=1.1000,
+            entry_time=datetime.now().isoformat(),
+            stop_loss=1.0900,
+            take_profit=1.1100,
+            volume=0.1,
+            comment='Test trade'
+        )
+        self.assertIsNotNone(trade_id)
+        
+        # Przygotuj dane do aktualizacji
+        update_data = {
+            'status': 'CLOSED',
+            'exit_price': 1.1050,
+            'profit_loss': 50
+        }
+        
+        # Wykonaj aktualizację
+        result = self.db.update_trade(trade_id, update_data)
+        self.assertTrue(result)
+        
+        # Sprawdź, czy dane zostały zaktualizowane
+        trades = self.db.get_trades()
+        self.assertEqual(len(trades), 1)
+        updated_trade = trades[0]
+        self.assertEqual(updated_trade['status'], 'CLOSED')
+        self.assertEqual(updated_trade['exit_price'], 1.1050)
+        self.assertEqual(updated_trade['profit_loss'], 50)
+
+    def test_update_trade_nonexistent(self):
+        """Test aktualizacji nieistniejącej transakcji."""
+        update_data = {
+            'status': 'CLOSED',
+            'exit_price': 1.1050
+        }
+        result = self.db.update_trade(999, update_data)
+        self.assertFalse(result)
+
+    def test_update_trade_invalid_data(self):
+        """Test aktualizacji z nieprawidłowymi danymi."""
+        # Najpierw dodaj transakcję
+        trade_id = self.db.insert_trade(
+            trade_idea_id=None,
+            symbol='EURUSD',
+            direction='BUY',
+            entry_price=1.1000,
+            entry_time=datetime.now().isoformat(),
+            stop_loss=1.0900,
+            take_profit=1.1100,
+            volume=0.1,
+            comment='Test trade'
+        )
+        self.assertIsNotNone(trade_id)
+        
+        # Próba aktualizacji z nieprawidłowymi danymi
+        update_data = {
+            'nonexistent_column': 'value'  # Kolumna nie istnieje w tabeli
+        }
+        result = self.db.update_trade(trade_id, update_data)
+        self.assertFalse(result)
+
+if __name__ == '__main__':
+    unittest.main() 

@@ -1,0 +1,636 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="pl" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Metoda Master &mdash; LLM Trading System 1.0 - dokumentacja</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=331e28ce"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/translations.js?v=da4973ce"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Indeks" href="genindex.html" />
+    <link rel="search" title="Szukaj" href="search.html" />
+    <link rel="next" title="Uruchamianie" href="uruchamianie.html" />
+    <link rel="prev" title="Struktura systemu" href="struktura_systemu.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            LLM Trading System
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Szukaj" aria-label="Szukaj" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Spis treści:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="wprowadzenie.html">Wprowadzenie</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="wprowadzenie.html#czym-jest-llm-trading-system">Czym jest LLM Trading System?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wprowadzenie.html#podstawowe-zalozenia">Podstawowe założenia</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wprowadzenie.html#kluczowe-funkcjonalnosci">Kluczowe funkcjonalności</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wprowadzenie.html#analiza-rynku-przy-uzyciu-llm">Analiza rynku przy użyciu LLM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="wprowadzenie.html#automatyczne-zarzadzanie-transakcjami">Automatyczne zarządzanie transakcjami</a></li>
+<li class="toctree-l3"><a class="reference internal" href="wprowadzenie.html#dashboard-monitorujacy">Dashboard monitorujący</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wprowadzenie.html#architektura-systemu">Architektura systemu</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wprowadzenie.html#przeplyw-danych">Przepływ danych</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wprowadzenie.html#strategie-handlowe">Strategie handlowe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wprowadzenie.html#zarzadzanie-ryzykiem">Zarządzanie ryzykiem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wprowadzenie.html#dla-kogo-jest-ten-system">Dla kogo jest ten system?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wprowadzenie.html#pierwsze-kroki">Pierwsze kroki</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="instalacja.html">Instalacja</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="instalacja.html#wymagania-systemowe">Wymagania systemowe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instalacja.html#kroki-instalacji">Kroki instalacji</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="instalacja.html#pobranie-repozytorium">1. Pobranie repozytorium</a></li>
+<li class="toctree-l3"><a class="reference internal" href="instalacja.html#instalacja-pakietow-i-zaleznosci">2. Instalacja pakietów i zależności</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="instalacja.html#uzywajac-poetry-zalecane">Używając Poetry (zalecane)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="instalacja.html#uzywajac-pip">Używając pip</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="instalacja.html#konfiguracja-srodowiska">3. Konfiguracja środowiska</a></li>
+<li class="toctree-l3"><a class="reference internal" href="instalacja.html#instalacja-expert-advisor-w-metatrader-5">4. Instalacja Expert Advisor w MetaTrader 5</a></li>
+<li class="toctree-l3"><a class="reference internal" href="instalacja.html#inicjalizacja-bazy-danych">5. Inicjalizacja bazy danych</a></li>
+<li class="toctree-l3"><a class="reference internal" href="instalacja.html#konfiguracja-strategii-handlowej">6. Konfiguracja strategii handlowej</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="instalacja.html#uruchamianie-systemu">Uruchamianie systemu</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="instalacja.html#uruchomienie-agenta-handlowego">1. Uruchomienie agenta handlowego</a></li>
+<li class="toctree-l3"><a class="reference internal" href="instalacja.html#uruchomienie-dashboardu">2. Uruchomienie dashboardu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="instalacja.html#jednorazowa-analiza-rynku">3. Jednorazowa analiza rynku</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="instalacja.html#konfiguracja-produkcyjna">Konfiguracja produkcyjna</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instalacja.html#rozwiazywanie-problemow">Rozwiązywanie problemów</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="instalacja.html#problemy-z-polaczeniem-z-mt5">Problemy z połączeniem z MT5</a></li>
+<li class="toctree-l3"><a class="reference internal" href="instalacja.html#problemy-z-api-grok">Problemy z API Grok</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="instalacja.html#aktualizacja">Aktualizacja</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instalacja.html#bezpieczenstwo">Bezpieczeństwo</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="struktura_systemu.html">Struktura systemu</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="struktura_systemu.html#glowna-struktura-katalogow">Główna struktura katalogów</a></li>
+<li class="toctree-l2"><a class="reference internal" href="struktura_systemu.html#komponenty-systemu-i-ich-struktura">Komponenty systemu i ich struktura</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="struktura_systemu.html#agent-manager">Agent_Manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="struktura_systemu.html#dashboard">Dashboard</a></li>
+<li class="toctree-l3"><a class="reference internal" href="struktura_systemu.html#database">Database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="struktura_systemu.html#llm-engine">LLM_Engine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="struktura_systemu.html#mt5-connector">MT5_Connector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="struktura_systemu.html#scripts">scripts</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="struktura_systemu.html#uruchamianie-komponentow">Uruchamianie komponentów</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="struktura_systemu.html#sposoby-uruchamiania">Sposoby uruchamiania</a></li>
+<li class="toctree-l3"><a class="reference internal" href="struktura_systemu.html#zaleznosci-miedzy-komponentami">Zależności między komponentami</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="struktura_systemu.html#pliki-konfiguracyjne">Pliki konfiguracyjne</a></li>
+<li class="toctree-l2"><a class="reference internal" href="struktura_systemu.html#uwagi-dotyczace-uruchomienia">Uwagi dotyczące uruchomienia</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Metoda Master</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#metoda-master-zintegrowany-system-handlowy-dla-malych-kont">Metoda Master – Zintegrowany System Handlowy dla Małych Kont</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#wstep">Wstęp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#czesc-i-wybor-odpowiednich-instrumentow-dla-malego-konta">Część I: Wybór odpowiednich instrumentów dla małego konta</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#kryteria-wyboru-instrumentow">Kryteria wyboru instrumentów:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dostosowanie-metody-master-do-par-walutowych">Dostosowanie Metody Master do par walutowych:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#forex-pary-walutowe">Forex (pary walutowe):</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#uniwersalne-zasady-handlu-parami-walutowymi">Uniwersalne zasady handlu parami walutowymi:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#czesc-ii-zintegrowany-framework-decyzyjny">Część II: Zintegrowany Framework Decyzyjny</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#krok-1-analiza-kontekstu-rynkowego-z-metody-1">Krok 1: Analiza Kontekstu Rynkowego (z Metody 1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#krok-2-analiza-krotkoterminowa-z-metody-2">Krok 2: Analiza Krótkoterminowa (z Metody 2)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#krok-3-precyzyjna-analiza-vwap-z-metody-3">Krok 3: Precyzyjna Analiza VWAP (z Metody 3)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#czesc-iii-trzy-glowne-setupy-handlowe">Część III: Trzy Główne Setupy Handlowe</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#setup-1-trend-reverter-dla-malych-kont">Setup 1: „Trend Reverter” (dla małych kont)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#setup-2-vwap-bouncer-dla-malych-kont">Setup 2: „VWAP Bouncer” (dla małych kont)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#setup-3-small-account-range-rider-specjalnie-dla-malych-kont">Setup 3: „Small Account Range Rider” (specjalnie dla małych kont)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#czesc-iv-zarzadzanie-ryzykiem-dla-malych-kont">Część IV: Zarządzanie Ryzykiem dla Małych Kont</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#reguly-podstawowe">Reguły podstawowe:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#czesc-v-praktyczne-wskazowki-dla-malych-kont">Część V: Praktyczne Wskazówki dla Małych Kont</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#czesc-vi-progresja-konta-plan-rozwoju">Część VI: Progresja Konta (Plan Rozwoju)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#faza-1-konto-500-1000">Faza 1: Konto $500-$1000</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#faza-2-konto-1000-2500">Faza 2: Konto $1000-$2500</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#faza-3-konto-2500-5000">Faza 3: Konto $2500-$5000</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#czesc-vii-checklist-przed-kazdym-tradem">Część VII: Checklist przed każdym Tradem</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="uruchamianie.html">Uruchamianie</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="uruchamianie.html#wymagania-wstepne">Wymagania wstępne</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uruchamianie.html#uruchomienie-calego-systemu">Uruchomienie całego systemu</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uruchamianie.html#uruchamianie-poszczegolnych-komponentow">Uruchamianie poszczególnych komponentów</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="uruchamianie.html#database">Database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="uruchamianie.html#mt5-connector">MT5_Connector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="uruchamianie.html#llm-engine">LLM_Engine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="uruchamianie.html#agent-manager">Agent_Manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="uruchamianie.html#dashboard">Dashboard</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="uruchamianie.html#skrypty-pomocnicze">Skrypty pomocnicze</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="uruchamianie.html#inicjalizacja-bazy-danych">Inicjalizacja bazy danych</a></li>
+<li class="toctree-l3"><a class="reference internal" href="uruchamianie.html#konfiguracja-srodowiska">Konfiguracja środowiska</a></li>
+<li class="toctree-l3"><a class="reference internal" href="uruchamianie.html#jednorazowa-analiza-rynku">Jednorazowa analiza rynku</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="uruchamianie.html#monitorowanie-systemu">Monitorowanie systemu</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="uruchamianie.html#monitorowanie-w-czasie-rzeczywistym">Monitorowanie w czasie rzeczywistym</a></li>
+<li class="toctree-l3"><a class="reference internal" href="uruchamianie.html#monitorowanie-w-trybie-tekstowym">Monitorowanie w trybie tekstowym</a></li>
+<li class="toctree-l3"><a class="reference internal" href="uruchamianie.html#logi-systemowe">Logi systemowe</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="uruchamianie.html#zatrzymywanie-systemu">Zatrzymywanie systemu</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="uruchamianie.html#zatrzymanie-calego-systemu">Zatrzymanie całego systemu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="uruchamianie.html#zatrzymanie-pojedynczego-komponentu">Zatrzymanie pojedynczego komponentu</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="uruchamianie.html#automatyczny-restart">Automatyczny restart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uruchamianie.html#uruchamianie-w-srodowisku-produkcyjnym">Uruchamianie w środowisku produkcyjnym</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uruchamianie.html#rozwiazywanie-problemow">Rozwiązywanie problemów</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="komponenty/index.html">Komponenty</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="komponenty/agent_manager.html">Agent Manager</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/agent_manager.html#funkcje">Funkcje</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/agent_manager.html#struktura-modulu">Struktura modułu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/agent_manager.html#glowne-klasy-i-ich-rola">Główne klasy i ich rola</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="komponenty/agent_manager.html#agentmanager">AgentManager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="komponenty/agent_manager.html#coordinator">Coordinator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="komponenty/agent_manager.html#orderprocessor">OrderProcessor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="komponenty/agent_manager.html#riskmanager">RiskManager</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/agent_manager.html#uruchamianie">Uruchamianie</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/agent_manager.html#konfiguracja">Konfiguracja</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/agent_manager.html#przeplyw-pracy">Przepływ pracy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/agent_manager.html#logi">Logi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/agent_manager.html#rozwiazywanie-problemow">Rozwiązywanie problemów</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="komponenty/llm_engine.html">LLM Engine</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/llm_engine.html#funkcje">Funkcje</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/llm_engine.html#struktura-modulu">Struktura modułu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/llm_engine.html#glowne-klasy-i-ich-rola">Główne klasy i ich rola</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="komponenty/llm_engine.html#llmengine">LLMEngine</a></li>
+<li class="toctree-l4"><a class="reference internal" href="komponenty/llm_engine.html#llmclient">LLMClient</a></li>
+<li class="toctree-l4"><a class="reference internal" href="komponenty/llm_engine.html#promptbuilder">PromptBuilder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="komponenty/llm_engine.html#responseparser">ResponseParser</a></li>
+<li class="toctree-l4"><a class="reference internal" href="komponenty/llm_engine.html#marketanalyzer">MarketAnalyzer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="komponenty/llm_engine.html#technicalindicators-i-advancedindicators">TechnicalIndicators i AdvancedIndicators</a></li>
+<li class="toctree-l4"><a class="reference internal" href="komponenty/llm_engine.html#cachemanager">CacheManager</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/llm_engine.html#uruchamianie">Uruchamianie</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/llm_engine.html#konfiguracja">Konfiguracja</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/llm_engine.html#przeplyw-pracy">Przepływ pracy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/llm_engine.html#szablony-promptow">Szablony promptów</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/llm_engine.html#parsowanie-odpowiedzi">Parsowanie odpowiedzi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/llm_engine.html#rozwiazywanie-problemow">Rozwiązywanie problemów</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/llm_engine.html#integracja-z-innymi-komponentami">Integracja z innymi komponentami</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/llm_engine.html#api-komponentu">API komponentu</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">Dokumentacja API</a><ul class="simple">
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">LLM Trading System</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Metoda Master</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/metoda_master.rst.txt" rel="nofollow"> Zobacz źródło strony</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="metoda-master">
+<h1>Metoda Master<a class="headerlink" href="#metoda-master" title="Link to this heading"></a></h1>
+<section id="metoda-master-zintegrowany-system-handlowy-dla-malych-kont">
+<h2>Metoda Master – Zintegrowany System Handlowy dla Małych Kont<a class="headerlink" href="#metoda-master-zintegrowany-system-handlowy-dla-malych-kont" title="Link to this heading"></a></h2>
+<section id="wstep">
+<h3>Wstęp<a class="headerlink" href="#wstep" title="Link to this heading"></a></h3>
+<p>Ta metoda stanowi połączenie trzech skutecznych strategii handlowych, zoptymalizowanych specjalnie dla osób z małym kapitałem początkowym. System ten pozwala na maksymalizację efektywności każdego zainwestowanego złotego poprzez precyzyjne wejścia, ścisłe zarządzanie ryzykiem i jasno określone cele. Metoda Master łączy:</p>
+<ol class="arabic simple">
+<li><p>Analizę trendu i dobór odpowiednich aktywów z Metody 1</p></li>
+<li><p>Zrozumienie manipulacji rynkowej i psychologii z Metody 2</p></li>
+<li><p>Precyzyjne wejścia i wyjścia z wykorzystaniem VWAP z Metody 3</p></li>
+</ol>
+</section>
+<section id="czesc-i-wybor-odpowiednich-instrumentow-dla-malego-konta">
+<h3>Część I: Wybór odpowiednich instrumentów dla małego konta<a class="headerlink" href="#czesc-i-wybor-odpowiednich-instrumentow-dla-malego-konta" title="Link to this heading"></a></h3>
+<p>Kluczem do sukcesu przy małym kapitale jest wybór instrumentów, które oferują optymalny balans między kosztem wejścia, płynnością, zmiennością i potencjałem zysku. Metoda Master może być zastosowana do różnych klas aktywów, przy odpowiednim dostosowaniu do ich specyfiki.</p>
+<section id="kryteria-wyboru-instrumentow">
+<h4>Kryteria wyboru instrumentów:<a class="headerlink" href="#kryteria-wyboru-instrumentow" title="Link to this heading"></a></h4>
+<ol class="arabic simple">
+<li><p><strong>Koszt wejścia</strong> - instrument powinien być dostępny dla twojego rozmiaru konta</p></li>
+<li><p><strong>Płynność</strong> - wystarczająca dla łatwego wejścia i wyjścia bez poślizgu</p></li>
+<li><p><strong>Zmienność</strong> - odpowiednia dla generowania satysfakcjonujących zysków</p></li>
+<li><p><strong>Przewidywalność techniczna</strong> - reagowanie na poziomy wsparcia/oporu, VWAP i formacje świecowe</p></li>
+</ol>
+</section>
+<section id="dostosowanie-metody-master-do-par-walutowych">
+<h4>Dostosowanie Metody Master do par walutowych:<a class="headerlink" href="#dostosowanie-metody-master-do-par-walutowych" title="Link to this heading"></a></h4>
+</section>
+<section id="forex-pary-walutowe">
+<h4>Forex (pary walutowe):<a class="headerlink" href="#forex-pary-walutowe" title="Link to this heading"></a></h4>
+<p><strong>Zalecane pary walutowe:</strong></p>
+<ul class="simple">
+<li><p>Główne: EUR/USD, GBP/USD, USD/JPY, USD/CHF, AUD/USD</p></li>
+<li><p>Krzyżowe: EUR/GBP, EUR/JPY, GBP/JPY</p></li>
+<li><p>Egzotyczne (dla bardziej doświadczonych): USD/CAD, NZD/USD</p></li>
+</ul>
+<p><strong>Wielkość pozycji według rozmiaru konta:</strong></p>
+<ul class="simple">
+<li><p>Konto 100-500$: mikro-loty (0.01)</p></li>
+<li><p>Konto 500-1000$: mikro-loty (0.01-0.03)</p></li>
+<li><p>Konto 1000-2500$: mini-loty (0.1)</p></li>
+</ul>
+<p><strong>Najlepsze setupy dla par walutowych:</strong></p>
+<ul class="simple">
+<li><p>„VWAP Bouncer” - szczególnie skuteczny na parach głównych jak EUR/USD</p></li>
+<li><p>„Small Account Range Rider” - idealny dla par z wyraźnymi dziennymi zakresami</p></li>
+<li><p>„Trend Reverter” - najlepszy podczas silnych ruchów po ważnych danych ekonomicznych</p></li>
+</ul>
+<p><strong>Najlepsze godziny handlu:</strong></p>
+<ul class="simple">
+<li><p>Nakładanie się sesji europejskiej i amerykańskiej (14:00-17:00 CET)</p></li>
+<li><p>Początek sesji europejskiej (8:00-10:00 CET)</p></li>
+<li><p>Podczas publikacji ważnych danych makroekonomicznych</p></li>
+</ul>
+<p><strong>Specyfika handlu parami walutowymi:</strong></p>
+<ul class="simple">
+<li><p>Zawsze zwracaj uwagę na kalendarz ekonomiczny</p></li>
+<li><p>Śledź decyzje banków centralnych (FED, EBC, BoE, BoJ)</p></li>
+<li><p>Uwzględniaj korelacje między parami walutowymi</p></li>
+<li><p>Pamiętaj o różnicach w spread’ach podczas sesji azjatyckiej</p></li>
+</ul>
+<p><strong>Zarządzanie ryzykiem na Forex:</strong></p>
+<ul class="simple">
+<li><p>Stop-lossy: 15-25 pipsów dla setupów krótkoterminowych</p></li>
+<li><p>Cele zysku: minimum 1.5:1 (ryzyko:zysk)</p></li>
+<li><p>Ważne: dostosuj wielkość pozycji do zmienności danej pary</p></li>
+</ul>
+<p><strong>Zastosowanie VWAP na Forex:</strong></p>
+<ul class="simple">
+<li><p>Resetuj VWAP na początku sesji londyńskiej (8:00 CET)</p></li>
+<li><p>Obserwuj odchylenia od VWAP podczas publikacji danych</p></li>
+<li><p>VWAP działa najlepiej na wykresach 5-minutowych i 15-minutowych</p></li>
+</ul>
+</section>
+<section id="uniwersalne-zasady-handlu-parami-walutowymi">
+<h4>Uniwersalne zasady handlu parami walutowymi:<a class="headerlink" href="#uniwersalne-zasady-handlu-parami-walutowymi" title="Link to this heading"></a></h4>
+<ol class="arabic simple">
+<li><p><strong>Handluj tym, co znasz</strong> - skoncentruj się na 2-3 głównych parach walutowych</p></li>
+<li><p><strong>Monitoruj spread</strong> - szczególnie ważne przy małych kontach</p></li>
+<li><p><strong>Uważaj na dźwignię</strong> - korzystaj z niej świadomie i ostrożnie</p></li>
+<li><p><strong>Uwzględniaj środowisko rynkowe</strong> - rozpoznawaj okresy wysokiej i niskiej zmienności</p></li>
+<li><p><strong>Testuj i adaptuj</strong> - regularnie analizuj, które pary walutowe dają najlepsze wyniki z Metodą Master</p></li>
+</ol>
+</section>
+</section>
+<section id="czesc-ii-zintegrowany-framework-decyzyjny">
+<h3>Część II: Zintegrowany Framework Decyzyjny<a class="headerlink" href="#czesc-ii-zintegrowany-framework-decyzyjny" title="Link to this heading"></a></h3>
+<section id="krok-1-analiza-kontekstu-rynkowego-z-metody-1">
+<h4>Krok 1: Analiza Kontekstu Rynkowego (z Metody 1)<a class="headerlink" href="#krok-1-analiza-kontekstu-rynkowego-z-metody-1" title="Link to this heading"></a></h4>
+<ol class="arabic simple">
+<li><p><strong>Określenie głównego trendu:</strong></p>
+<ul class="simple">
+<li><p>Otwórz wykres dzienny instrumentu</p></li>
+<li><p>Zastosuj prostą średnią ruchomą 50-dniową (50 SMA)</p></li>
+<li><p>Cena powyżej 50 SMA = trend wzrostowy (nastawienie na kupno)</p></li>
+<li><p>Cena poniżej 50 SMA = trend spadkowy (nastawienie na sprzedaż)</p></li>
+</ul>
+</li>
+<li><p><strong>Określenie dziennego zakresu:</strong></p>
+<ul class="simple">
+<li><p>Zastosuj wskaźnik Average True Range (ATR) na wykresie dziennym</p></li>
+<li><p>Zanotuj wartość - pokazuje przeciętny dzienny ruch instrumentu</p></li>
+<li><p>Sprawdź, ile procent dziennego zakresu zostało już wykorzystane</p></li>
+</ul>
+</li>
+</ol>
+</section>
+<section id="krok-2-analiza-krotkoterminowa-z-metody-2">
+<h4>Krok 2: Analiza Krótkoterminowa (z Metody 2)<a class="headerlink" href="#krok-2-analiza-krotkoterminowa-z-metody-2" title="Link to this heading"></a></h4>
+<ol class="arabic simple">
+<li><p><strong>Zidentyfikuj „Sucker Step” (krok wabik):</strong></p>
+<ul class="simple">
+<li><p>W trendzie wzrostowym: gwałtowne spadki ceny</p></li>
+<li><p>W trendzie spadkowym: gwałtowne wzrosty ceny</p></li>
+<li><p>Te ruchy mają na celu wyłapanie stop-lossów i stworzenie płynności</p></li>
+</ul>
+</li>
+<li><p><strong>Obserwuj wyłonienie „wieloryba” (dużego gracza):</strong></p>
+<ul class="simple">
+<li><p>Świece z długimi dolnymi knotami (John Wick) w trendzie wzrostowym</p></li>
+<li><p>Świece z długimi górnymi knotami w trendzie spadkowym</p></li>
+<li><p>Przełamanie poprzedniego szczytu/dołka świecy</p></li>
+</ul>
+</li>
+</ol>
+</section>
+<section id="krok-3-precyzyjna-analiza-vwap-z-metody-3">
+<h4>Krok 3: Precyzyjna Analiza VWAP (z Metody 3)<a class="headerlink" href="#krok-3-precyzyjna-analiza-vwap-z-metody-3" title="Link to this heading"></a></h4>
+<ol class="arabic simple">
+<li><p><strong>Skonfiguruj wskaźnik VWAP:</strong></p>
+<ul class="simple">
+<li><p>Włącz dane 24-godzinne/premarket na swoim wykresie</p></li>
+<li><p>Dodaj wskaźnik VWAP, pozostawiając tylko linię centralną</p></li>
+</ul>
+</li>
+<li><p><strong>Zinterpretuj pozycję ceny względem VWAP:</strong></p>
+<ul class="simple">
+<li><p>Cena znacząco powyżej VWAP = potencjalna okazja do sprzedaży (w trendzie spadkowym)</p></li>
+<li><p>Cena znacząco poniżej VWAP = potencjalna okazja do kupna (w trendzie wzrostowym)</p></li>
+<li><p>Cena powracająca do VWAP = potencjalna okazja do odbicia lub odrzucenia</p></li>
+</ul>
+</li>
+</ol>
+</section>
+</section>
+<section id="czesc-iii-trzy-glowne-setupy-handlowe">
+<h3>Część III: Trzy Główne Setupy Handlowe<a class="headerlink" href="#czesc-iii-trzy-glowne-setupy-handlowe" title="Link to this heading"></a></h3>
+<section id="setup-1-trend-reverter-dla-malych-kont">
+<h4>Setup 1: „Trend Reverter” (dla małych kont)<a class="headerlink" href="#setup-1-trend-reverter-dla-malych-kont" title="Link to this heading"></a></h4>
+<p>Ten setup wykorzystuje odwrócenia krótkoterminowe w kierunku głównego trendu.</p>
+<p><strong>Warunki wejścia:</strong></p>
+<ol class="arabic simple">
+<li><p>Instrument zgodny z głównym trendem (określonym przez 50 SMA)</p></li>
+<li><p>Znaczące odchylenie ceny od VWAP przeciwnie do głównego trendu</p></li>
+<li><p>Formacja świecowa odwrócenia (John Wick, Power Tower) przy poziomie wsparcia/oporu</p></li>
+<li><p>Przełamanie poprzedniego lokalnego ekstrema</p></li>
+</ol>
+<p><strong>Zarządzanie pozycją:</strong></p>
+<ul class="simple">
+<li><p><strong>Wejście:</strong> Po potwierdzeniu formacji odwrócenia</p></li>
+<li><p><strong>Stop-loss:</strong> Tuż za lokalnym ekstremum (maksymalnie 2% kapitału)</p></li>
+<li><p><strong>Cel zysku:</strong> Powrót do VWAP (cel minimalny) lub przebicie VWAP w kierunku trendu (cel optymalny)</p></li>
+</ul>
+<p><strong>Przykład dla małego konta:</strong></p>
+<ul class="simple">
+<li><p>Para EUR/USD w trendzie wzrostowym (nad 50 SMA)</p></li>
+<li><p>Krótkoterminowy spadek znacząco poniżej VWAP</p></li>
+<li><p>Formacja młota (hammer) przy wsparciu</p></li>
+<li><p>Wejście: po przebiciu wysokiego cienia młota</p></li>
+<li><p>Stop-loss: pod dołkiem świecy młota</p></li>
+<li><p>Cel: powrót do VWAP lub wyżej</p></li>
+</ul>
+</section>
+<section id="setup-2-vwap-bouncer-dla-malych-kont">
+<h4>Setup 2: „VWAP Bouncer” (dla małych kont)<a class="headerlink" href="#setup-2-vwap-bouncer-dla-malych-kont" title="Link to this heading"></a></h4>
+<p>Ten setup wykorzystuje odbicia od VWAP zgodne z głównym trendem.</p>
+<p><strong>Warunki wejścia:</strong></p>
+<ol class="arabic simple">
+<li><p>Instrument w wyraźnym trendzie (nad/pod 50 SMA)</p></li>
+<li><p>Cena powraca do VWAP po wcześniejszym odchyleniu</p></li>
+<li><p>Formacja świecowa wskazująca na odbicie/odrzucenie od VWAP</p></li>
+<li><p>Kierunek odbicia zgodny z głównym trendem</p></li>
+</ol>
+<p><strong>Zarządzanie pozycją:</strong></p>
+<ul class="simple">
+<li><p><strong>Wejście:</strong> Po formacji świecowej potwierdzającej odbicie od VWAP</p></li>
+<li><p><strong>Stop-loss:</strong> Za VWAP (maksymalnie 1.5% kapitału)</p></li>
+<li><p><strong>Cel zysku:</strong> Poprzednie lokalne ekstremum</p></li>
+</ul>
+<p><strong>Przykład dla małego konta:</strong></p>
+<ul class="simple">
+<li><p>Para GBP/USD w trendzie wzrostowym</p></li>
+<li><p>Cena spada do VWAP po wcześniejszym wzroście</p></li>
+<li><p>Formacja Pin Bar przy VWAP</p></li>
+<li><p>Wejście: po zamknięciu świecy powyżej połowy Pin Bar</p></li>
+<li><p>Stop-loss: pod dołkiem Pin Bar</p></li>
+<li><p>Cel: poprzedni szczyt</p></li>
+</ul>
+</section>
+<section id="setup-3-small-account-range-rider-specjalnie-dla-malych-kont">
+<h4>Setup 3: „Small Account Range Rider” (specjalnie dla małych kont)<a class="headerlink" href="#setup-3-small-account-range-rider-specjalnie-dla-malych-kont" title="Link to this heading"></a></h4>
+<p>Ten setup wykorzystuje dzienne zakresy cenowe typowe dla instrumentów o niskiej cenie jednostkowej.</p>
+<p><strong>Warunki wejścia:</strong></p>
+<ol class="arabic simple">
+<li><p>Para walutowa z wyraźnym dziennym zakresem (ATR)</p></li>
+<li><p>Instrument wykorzystał już 70-80% swojego dziennego zakresu (ATR)</p></li>
+<li><p>Ruch w kierunku przeciwnym do głównego trendu</p></li>
+<li><p>Formacja świecowa odwrócenia przy poziomie wsparcia/oporu</p></li>
+<li><p>VWAP potwierdza potencjalne odwrócenie (cena znacząco odchylona od VWAP)</p></li>
+</ol>
+<p><strong>Zarządzanie pozycją:</strong></p>
+<ul class="simple">
+<li><p><strong>Wejście:</strong> Po potwierdzeniu formacji odwrócenia</p></li>
+<li><p><strong>Stop-loss:</strong> Za lokalnym ekstremum (maksymalnie 2% kapitału)</p></li>
+<li><p><strong>Cel zysku:</strong> Ruch o 50% dziennego ATR w kierunku głównego trendu</p></li>
+</ul>
+<p><strong>Przykład dla małego konta:</strong></p>
+<ul class="simple">
+<li><p>Para USD/JPY z ATR = 80 pipsów</p></li>
+<li><p>Wzrost o 65 pipsów (81% ATR) przeciwnie do trendu spadkowego</p></li>
+<li><p>Formacja gwiazdy wieczornej przy oporze</p></li>
+<li><p>Wejście: po potwierdzeniu spadkowej świecy</p></li>
+<li><p>Stop-loss: nad szczytem formacji</p></li>
+<li><p>Cel: spadek o 40 pipsów (50% ATR)</p></li>
+</ul>
+</section>
+</section>
+<section id="czesc-iv-zarzadzanie-ryzykiem-dla-malych-kont">
+<h3>Część IV: Zarządzanie Ryzykiem dla Małych Kont<a class="headerlink" href="#czesc-iv-zarzadzanie-ryzykiem-dla-malych-kont" title="Link to this heading"></a></h3>
+<section id="reguly-podstawowe">
+<h4>Reguły podstawowe:<a class="headerlink" href="#reguly-podstawowe" title="Link to this heading"></a></h4>
+<ol class="arabic simple">
+<li><p><strong>Nigdy nie ryzykuj więcej niż 1-2% kapitału na pojedynczy trade</strong></p>
+<ul class="simple">
+<li><p>Przykład: Konto $1000 = maksymalne ryzyko $10-$20 na trade</p></li>
+</ul>
+</li>
+<li><p><strong>Stosuj stałe pozycjonowanie</strong></p>
+<ul class="simple">
+<li><p>Dla kont &lt;$1000: Maksymalnie 10-15% kapitału na jedną pozycję</p></li>
+<li><p>Dla kont $1000-$2500: Maksymalnie 20% kapitału na jedną pozycję</p></li>
+</ul>
+</li>
+<li><p><strong>Zasada ochrony zysków</strong></p>
+<ul class="simple">
+<li><p>Po osiągnięciu 1:1 (ryzyko:zysk) przesuń stop-loss na break-even</p></li>
+<li><p>Po osiągnięciu 2:1 zabezpiecz 50% pozycji</p></li>
+</ul>
+</li>
+<li><p><strong>Zasada „trzech strat”</strong></p>
+<ul class="simple">
+<li><p>Po trzech kolejnych stratach zrób przerwę i przeanalizuj sytuację</p></li>
+<li><p>Zmniejsz wielkość pozycji o połowę po powrocie do handlu</p></li>
+</ul>
+</li>
+<li><p><strong>Zarządzanie dziennym ryzykiem</strong></p>
+<ul class="simple">
+<li><p>Ustal maksymalną dzienną stratę na poziomie 5% kapitału</p></li>
+<li><p>Po osiągnięciu tego limitu zakończ handel na dany dzień</p></li>
+</ul>
+</li>
+</ol>
+</section>
+</section>
+<section id="czesc-v-praktyczne-wskazowki-dla-malych-kont">
+<h3>Część V: Praktyczne Wskazówki dla Małych Kont<a class="headerlink" href="#czesc-v-praktyczne-wskazowki-dla-malych-kont" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Najlepsze godziny handlu:</strong></p>
+<ul class="simple">
+<li><p>Pierwsze 30 minut po otwarciu rynku (maksymalna zmienność)</p></li>
+<li><p>Ostatnia godzina sesji (zamykanie pozycji przez instytucje)</p></li>
+<li><p>Unikaj handlu w czasie południowej konsolidacji</p></li>
+</ul>
+</li>
+<li><p><strong>Zarządzanie kosztami transakcyjnymi:</strong></p>
+<ul class="simple">
+<li><p>Wybieraj brokera z niskimi prowizjami</p></li>
+<li><p>Unikaj częstego „przekręcania” małych pozycji</p></li>
+<li><p>Koncentruj się na setupach o potencjale co najmniej 3:1</p></li>
+</ul>
+</li>
+<li><p><strong>Psychologia małego konta:</strong></p>
+<ul class="simple">
+<li><p>Nie próbuj „nadrobić” strat zwiększając ryzyko</p></li>
+<li><p>Celebruj małe zyski - systematyczne budowanie konta jest kluczem</p></li>
+<li><p>Prowadź dziennik tradów z dokładnymi notatkami o setupach</p></li>
+</ul>
+</li>
+<li><p><strong>Efektywne wykorzystanie kapitału:</strong></p>
+<ul class="simple">
+<li><p>Jeśli nie widzisz idealnego setupu, pozostań w gotówce</p></li>
+<li><p>Handluj tylko wtedy, gdy wszystkie trzy elementy analizy (trend, manipulacja, VWAP) się zgadzają</p></li>
+<li><p>Jakość setupów &gt; ilość transakcji</p></li>
+</ul>
+</li>
+</ol>
+</section>
+<section id="czesc-vi-progresja-konta-plan-rozwoju">
+<h3>Część VI: Progresja Konta (Plan Rozwoju)<a class="headerlink" href="#czesc-vi-progresja-konta-plan-rozwoju" title="Link to this heading"></a></h3>
+<section id="faza-1-konto-500-1000">
+<h4>Faza 1: Konto $500-$1000<a class="headerlink" href="#faza-1-konto-500-1000" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Skoncentruj się na głównych parach walutowych z mikro-lotami (0.01)</p></li>
+<li><p>Handluj maksymalnie 2-3 razy dziennie</p></li>
+<li><p>Cel: osiągnięcie konsystentnych dziennych zysków w wysokości 1-2% kapitału</p></li>
+</ul>
+</section>
+<section id="faza-2-konto-1000-2500">
+<h4>Faza 2: Konto $1000-$2500<a class="headerlink" href="#faza-2-konto-1000-2500" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Zwiększ wielkość pozycji do 0.05-0.1 lota</p></li>
+<li><p>Zwiększ częstotliwość handlu do 3-5 razy dziennie</p></li>
+<li><p>Cel: konsystentne tygodniowe zyski w wysokości 5-7% kapitału</p></li>
+</ul>
+</section>
+<section id="faza-3-konto-2500-5000">
+<h4>Faza 3: Konto $2500-$5000<a class="headerlink" href="#faza-3-konto-2500-5000" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Zwiększ wielkość pozycji do 0.1-0.5 lota</p></li>
+<li><p>Utrzymuj dyscyplinę i stosuj te same reguły zarządzania ryzykiem</p></li>
+<li><p>Cel: konsystentne miesięczne zyski w wysokości 15-20% kapitału</p></li>
+</ul>
+</section>
+</section>
+<section id="czesc-vii-checklist-przed-kazdym-tradem">
+<h3>Część VII: Checklist przed każdym Tradem<a class="headerlink" href="#czesc-vii-checklist-przed-kazdym-tradem" title="Link to this heading"></a></h3>
+<p>Użyj tej checklisty przed każdym wejściem na pozycję, aby upewnić się, że spełnia wszystkie kryteria:</p>
+<ul class="simple">
+<li><p>[ ] Czy wybrałem odpowiednią parę walutową dla mojego rozmiaru konta?</p></li>
+<li><p>[ ] Czy znam główny trend (pozycja względem 50 SMA)?</p></li>
+<li><p>[ ] Czy dzienny zakres (ATR) daje potencjał na dobry stosunek zysku do ryzyka?</p></li>
+<li><p>[ ] Czy widzę oznaki „Sucker Step” lub manipulacji rynkowej?</p></li>
+<li><p>[ ] Czy cena jest w odpowiedniej relacji do VWAP?</p></li>
+<li><p>[ ] Czy mam potwierdzenie w postaci formacji świecowej?</p></li>
+<li><p>[ ] Czy mój stop-loss jest ustawiony za kluczowym ekstremum?</p></li>
+<li><p>[ ] Czy potencjalny zysk wynosi minimum 1.5:1 w stosunku do ryzyka?</p></li>
+<li><p>[ ] Czy ryzykuję maksymalnie 1-2% kapitału na ten trade?</p></li>
+<li><p>[ ] Czy handluję w optymalnych godzinach?</p></li>
+<li><p>[ ] Czy jestem świadomy zbliżających się wydarzeń ekonomicznych?</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="struktura_systemu.html" class="btn btn-neutral float-left" title="Struktura systemu" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Poprzedni</a>
+        <a href="uruchamianie.html" class="btn btn-neutral float-right" title="Uruchamianie" accesskey="n" rel="next">Następny <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Prawa zastrzeżone 2024, Mariusz.</p>
+  </div>
+
+  Zbudowano w <a href="https://www.sphinx-doc.org/">Sphinx</a> używając
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    dostarczone przez <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

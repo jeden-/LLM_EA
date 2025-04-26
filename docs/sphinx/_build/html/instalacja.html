@@ -1,0 +1,459 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="pl" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Instalacja &mdash; LLM Trading System 1.0 - dokumentacja</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=331e28ce"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/translations.js?v=da4973ce"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Indeks" href="genindex.html" />
+    <link rel="search" title="Szukaj" href="search.html" />
+    <link rel="next" title="Struktura systemu" href="struktura_systemu.html" />
+    <link rel="prev" title="Wprowadzenie" href="wprowadzenie.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            LLM Trading System
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Szukaj" aria-label="Szukaj" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Spis treści:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="wprowadzenie.html">Wprowadzenie</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="wprowadzenie.html#czym-jest-llm-trading-system">Czym jest LLM Trading System?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wprowadzenie.html#podstawowe-zalozenia">Podstawowe założenia</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wprowadzenie.html#kluczowe-funkcjonalnosci">Kluczowe funkcjonalności</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wprowadzenie.html#analiza-rynku-przy-uzyciu-llm">Analiza rynku przy użyciu LLM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="wprowadzenie.html#automatyczne-zarzadzanie-transakcjami">Automatyczne zarządzanie transakcjami</a></li>
+<li class="toctree-l3"><a class="reference internal" href="wprowadzenie.html#dashboard-monitorujacy">Dashboard monitorujący</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wprowadzenie.html#architektura-systemu">Architektura systemu</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wprowadzenie.html#przeplyw-danych">Przepływ danych</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wprowadzenie.html#strategie-handlowe">Strategie handlowe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wprowadzenie.html#zarzadzanie-ryzykiem">Zarządzanie ryzykiem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wprowadzenie.html#dla-kogo-jest-ten-system">Dla kogo jest ten system?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wprowadzenie.html#pierwsze-kroki">Pierwsze kroki</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Instalacja</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#wymagania-systemowe">Wymagania systemowe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#kroki-instalacji">Kroki instalacji</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pobranie-repozytorium">1. Pobranie repozytorium</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#instalacja-pakietow-i-zaleznosci">2. Instalacja pakietów i zależności</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#uzywajac-poetry-zalecane">Używając Poetry (zalecane)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#uzywajac-pip">Używając pip</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#konfiguracja-srodowiska">3. Konfiguracja środowiska</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#instalacja-expert-advisor-w-metatrader-5">4. Instalacja Expert Advisor w MetaTrader 5</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#inicjalizacja-bazy-danych">5. Inicjalizacja bazy danych</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#konfiguracja-strategii-handlowej">6. Konfiguracja strategii handlowej</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#uruchamianie-systemu">Uruchamianie systemu</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#uruchomienie-agenta-handlowego">1. Uruchomienie agenta handlowego</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#uruchomienie-dashboardu">2. Uruchomienie dashboardu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#jednorazowa-analiza-rynku">3. Jednorazowa analiza rynku</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#konfiguracja-produkcyjna">Konfiguracja produkcyjna</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rozwiazywanie-problemow">Rozwiązywanie problemów</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#problemy-z-polaczeniem-z-mt5">Problemy z połączeniem z MT5</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#problemy-z-api-grok">Problemy z API Grok</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#aktualizacja">Aktualizacja</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#bezpieczenstwo">Bezpieczeństwo</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="struktura_systemu.html">Struktura systemu</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="struktura_systemu.html#glowna-struktura-katalogow">Główna struktura katalogów</a></li>
+<li class="toctree-l2"><a class="reference internal" href="struktura_systemu.html#komponenty-systemu-i-ich-struktura">Komponenty systemu i ich struktura</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="struktura_systemu.html#agent-manager">Agent_Manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="struktura_systemu.html#dashboard">Dashboard</a></li>
+<li class="toctree-l3"><a class="reference internal" href="struktura_systemu.html#database">Database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="struktura_systemu.html#llm-engine">LLM_Engine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="struktura_systemu.html#mt5-connector">MT5_Connector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="struktura_systemu.html#scripts">scripts</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="struktura_systemu.html#uruchamianie-komponentow">Uruchamianie komponentów</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="struktura_systemu.html#sposoby-uruchamiania">Sposoby uruchamiania</a></li>
+<li class="toctree-l3"><a class="reference internal" href="struktura_systemu.html#zaleznosci-miedzy-komponentami">Zależności między komponentami</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="struktura_systemu.html#pliki-konfiguracyjne">Pliki konfiguracyjne</a></li>
+<li class="toctree-l2"><a class="reference internal" href="struktura_systemu.html#uwagi-dotyczace-uruchomienia">Uwagi dotyczące uruchomienia</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="metoda_master.html">Metoda Master</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="metoda_master.html#metoda-master-zintegrowany-system-handlowy-dla-malych-kont">Metoda Master – Zintegrowany System Handlowy dla Małych Kont</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="metoda_master.html#wstep">Wstęp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="metoda_master.html#czesc-i-wybor-odpowiednich-instrumentow-dla-malego-konta">Część I: Wybór odpowiednich instrumentów dla małego konta</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="metoda_master.html#kryteria-wyboru-instrumentow">Kryteria wyboru instrumentów:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="metoda_master.html#dostosowanie-metody-master-do-par-walutowych">Dostosowanie Metody Master do par walutowych:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="metoda_master.html#forex-pary-walutowe">Forex (pary walutowe):</a></li>
+<li class="toctree-l4"><a class="reference internal" href="metoda_master.html#uniwersalne-zasady-handlu-parami-walutowymi">Uniwersalne zasady handlu parami walutowymi:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="metoda_master.html#czesc-ii-zintegrowany-framework-decyzyjny">Część II: Zintegrowany Framework Decyzyjny</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="metoda_master.html#krok-1-analiza-kontekstu-rynkowego-z-metody-1">Krok 1: Analiza Kontekstu Rynkowego (z Metody 1)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="metoda_master.html#krok-2-analiza-krotkoterminowa-z-metody-2">Krok 2: Analiza Krótkoterminowa (z Metody 2)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="metoda_master.html#krok-3-precyzyjna-analiza-vwap-z-metody-3">Krok 3: Precyzyjna Analiza VWAP (z Metody 3)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="metoda_master.html#czesc-iii-trzy-glowne-setupy-handlowe">Część III: Trzy Główne Setupy Handlowe</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="metoda_master.html#setup-1-trend-reverter-dla-malych-kont">Setup 1: „Trend Reverter” (dla małych kont)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="metoda_master.html#setup-2-vwap-bouncer-dla-malych-kont">Setup 2: „VWAP Bouncer” (dla małych kont)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="metoda_master.html#setup-3-small-account-range-rider-specjalnie-dla-malych-kont">Setup 3: „Small Account Range Rider” (specjalnie dla małych kont)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="metoda_master.html#czesc-iv-zarzadzanie-ryzykiem-dla-malych-kont">Część IV: Zarządzanie Ryzykiem dla Małych Kont</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="metoda_master.html#reguly-podstawowe">Reguły podstawowe:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="metoda_master.html#czesc-v-praktyczne-wskazowki-dla-malych-kont">Część V: Praktyczne Wskazówki dla Małych Kont</a></li>
+<li class="toctree-l3"><a class="reference internal" href="metoda_master.html#czesc-vi-progresja-konta-plan-rozwoju">Część VI: Progresja Konta (Plan Rozwoju)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="metoda_master.html#faza-1-konto-500-1000">Faza 1: Konto $500-$1000</a></li>
+<li class="toctree-l4"><a class="reference internal" href="metoda_master.html#faza-2-konto-1000-2500">Faza 2: Konto $1000-$2500</a></li>
+<li class="toctree-l4"><a class="reference internal" href="metoda_master.html#faza-3-konto-2500-5000">Faza 3: Konto $2500-$5000</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="metoda_master.html#czesc-vii-checklist-przed-kazdym-tradem">Część VII: Checklist przed każdym Tradem</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="uruchamianie.html">Uruchamianie</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="uruchamianie.html#wymagania-wstepne">Wymagania wstępne</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uruchamianie.html#uruchomienie-calego-systemu">Uruchomienie całego systemu</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uruchamianie.html#uruchamianie-poszczegolnych-komponentow">Uruchamianie poszczególnych komponentów</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="uruchamianie.html#database">Database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="uruchamianie.html#mt5-connector">MT5_Connector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="uruchamianie.html#llm-engine">LLM_Engine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="uruchamianie.html#agent-manager">Agent_Manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="uruchamianie.html#dashboard">Dashboard</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="uruchamianie.html#skrypty-pomocnicze">Skrypty pomocnicze</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="uruchamianie.html#inicjalizacja-bazy-danych">Inicjalizacja bazy danych</a></li>
+<li class="toctree-l3"><a class="reference internal" href="uruchamianie.html#konfiguracja-srodowiska">Konfiguracja środowiska</a></li>
+<li class="toctree-l3"><a class="reference internal" href="uruchamianie.html#jednorazowa-analiza-rynku">Jednorazowa analiza rynku</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="uruchamianie.html#monitorowanie-systemu">Monitorowanie systemu</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="uruchamianie.html#monitorowanie-w-czasie-rzeczywistym">Monitorowanie w czasie rzeczywistym</a></li>
+<li class="toctree-l3"><a class="reference internal" href="uruchamianie.html#monitorowanie-w-trybie-tekstowym">Monitorowanie w trybie tekstowym</a></li>
+<li class="toctree-l3"><a class="reference internal" href="uruchamianie.html#logi-systemowe">Logi systemowe</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="uruchamianie.html#zatrzymywanie-systemu">Zatrzymywanie systemu</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="uruchamianie.html#zatrzymanie-calego-systemu">Zatrzymanie całego systemu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="uruchamianie.html#zatrzymanie-pojedynczego-komponentu">Zatrzymanie pojedynczego komponentu</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="uruchamianie.html#automatyczny-restart">Automatyczny restart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uruchamianie.html#uruchamianie-w-srodowisku-produkcyjnym">Uruchamianie w środowisku produkcyjnym</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uruchamianie.html#rozwiazywanie-problemow">Rozwiązywanie problemów</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="komponenty/index.html">Komponenty</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="komponenty/agent_manager.html">Agent Manager</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/agent_manager.html#funkcje">Funkcje</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/agent_manager.html#struktura-modulu">Struktura modułu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/agent_manager.html#glowne-klasy-i-ich-rola">Główne klasy i ich rola</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="komponenty/agent_manager.html#agentmanager">AgentManager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="komponenty/agent_manager.html#coordinator">Coordinator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="komponenty/agent_manager.html#orderprocessor">OrderProcessor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="komponenty/agent_manager.html#riskmanager">RiskManager</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/agent_manager.html#uruchamianie">Uruchamianie</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/agent_manager.html#konfiguracja">Konfiguracja</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/agent_manager.html#przeplyw-pracy">Przepływ pracy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/agent_manager.html#logi">Logi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/agent_manager.html#rozwiazywanie-problemow">Rozwiązywanie problemów</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="komponenty/llm_engine.html">LLM Engine</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/llm_engine.html#funkcje">Funkcje</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/llm_engine.html#struktura-modulu">Struktura modułu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/llm_engine.html#glowne-klasy-i-ich-rola">Główne klasy i ich rola</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="komponenty/llm_engine.html#llmengine">LLMEngine</a></li>
+<li class="toctree-l4"><a class="reference internal" href="komponenty/llm_engine.html#llmclient">LLMClient</a></li>
+<li class="toctree-l4"><a class="reference internal" href="komponenty/llm_engine.html#promptbuilder">PromptBuilder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="komponenty/llm_engine.html#responseparser">ResponseParser</a></li>
+<li class="toctree-l4"><a class="reference internal" href="komponenty/llm_engine.html#marketanalyzer">MarketAnalyzer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="komponenty/llm_engine.html#technicalindicators-i-advancedindicators">TechnicalIndicators i AdvancedIndicators</a></li>
+<li class="toctree-l4"><a class="reference internal" href="komponenty/llm_engine.html#cachemanager">CacheManager</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/llm_engine.html#uruchamianie">Uruchamianie</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/llm_engine.html#konfiguracja">Konfiguracja</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/llm_engine.html#przeplyw-pracy">Przepływ pracy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/llm_engine.html#szablony-promptow">Szablony promptów</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/llm_engine.html#parsowanie-odpowiedzi">Parsowanie odpowiedzi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/llm_engine.html#rozwiazywanie-problemow">Rozwiązywanie problemów</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/llm_engine.html#integracja-z-innymi-komponentami">Integracja z innymi komponentami</a></li>
+<li class="toctree-l3"><a class="reference internal" href="komponenty/llm_engine.html#api-komponentu">API komponentu</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">Dokumentacja API</a><ul class="simple">
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">LLM Trading System</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Instalacja</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/instalacja.rst.txt" rel="nofollow"> Zobacz źródło strony</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="instalacja">
+<h1>Instalacja<a class="headerlink" href="#instalacja" title="Link to this heading"></a></h1>
+<p>Ta instrukcja przeprowadzi Cię przez proces instalacji, konfiguracji i uruchomienia systemu LLM Trader MT5.</p>
+<section id="wymagania-systemowe">
+<h2>Wymagania systemowe<a class="headerlink" href="#wymagania-systemowe" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Python 3.10 lub nowszy</p></li>
+<li><p>MetaTrader 5</p></li>
+<li><p>Konto w platformie X.AI (dla dostępu do modelu Grok)</p></li>
+<li><p>Około 16 GB pamięci RAM (rekomendowane)</p></li>
+<li><p>Około 5 GB wolnego miejsca na dysku</p></li>
+</ul>
+</section>
+<section id="kroki-instalacji">
+<h2>Kroki instalacji<a class="headerlink" href="#kroki-instalacji" title="Link to this heading"></a></h2>
+<section id="pobranie-repozytorium">
+<h3>1. Pobranie repozytorium<a class="headerlink" href="#pobranie-repozytorium" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/twoj-username/llm-trader-mt5.git
+<span class="nb">cd</span><span class="w"> </span>llm-trader-mt5
+</pre></div>
+</div>
+</section>
+<section id="instalacja-pakietow-i-zaleznosci">
+<h3>2. Instalacja pakietów i zależności<a class="headerlink" href="#instalacja-pakietow-i-zaleznosci" title="Link to this heading"></a></h3>
+<section id="uzywajac-poetry-zalecane">
+<h4>Używając Poetry (zalecane)<a class="headerlink" href="#uzywajac-poetry-zalecane" title="Link to this heading"></a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Instalacja Poetry, jeśli nie jest zainstalowane</span>
+curl<span class="w"> </span>-sSL<span class="w"> </span>https://install.python-poetry.org<span class="w"> </span><span class="p">|</span><span class="w"> </span>python3<span class="w"> </span>-
+
+<span class="c1"># Instalacja zależności projektu</span>
+poetry<span class="w"> </span>install
+</pre></div>
+</div>
+</section>
+<section id="uzywajac-pip">
+<h4>Używając pip<a class="headerlink" href="#uzywajac-pip" title="Link to this heading"></a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Stworzenie wirtualnego środowiska</span>
+python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>venv
+<span class="nb">source</span><span class="w"> </span>venv/bin/activate<span class="w">  </span><span class="c1"># Linux/Mac</span>
+<span class="c1"># lub</span>
+venv<span class="se">\S</span>cripts<span class="se">\a</span>ctivate.bat<span class="w">  </span><span class="c1"># Windows</span>
+
+<span class="c1"># Instalacja zależności</span>
+pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+</pre></div>
+</div>
+</section>
+</section>
+<section id="konfiguracja-srodowiska">
+<h3>3. Konfiguracja środowiska<a class="headerlink" href="#konfiguracja-srodowiska" title="Link to this heading"></a></h3>
+<p>Utwórz plik <code class="docutils literal notranslate"><span class="pre">.env</span></code> na podstawie szablonu <code class="docutils literal notranslate"><span class="pre">.env.example</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp<span class="w"> </span>.env.example<span class="w"> </span>.env
+</pre></div>
+</div>
+<p>Otwórz plik <code class="docutils literal notranslate"><span class="pre">.env</span></code> i wprowadź odpowiednie wartości:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">X_API_KEY</span></code> - Twój klucz API X.AI</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MT5_USERNAME</span></code>, <code class="docutils literal notranslate"><span class="pre">MT5_PASSWORD</span></code>, <code class="docutils literal notranslate"><span class="pre">MT5_SERVER</span></code> - dane logowania do MT5</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MT5_PATH</span></code> - ścieżka do instalacji MT5</p></li>
+<li><p>Dostosuj pozostałe parametry według potrzeb</p></li>
+</ul>
+</section>
+<section id="instalacja-expert-advisor-w-metatrader-5">
+<h3>4. Instalacja Expert Advisor w MetaTrader 5<a class="headerlink" href="#instalacja-expert-advisor-w-metatrader-5" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p>Otwórz MetaTrader 5</p></li>
+<li><p>Przejdź do „File” &gt; „Open Data Folder”</p></li>
+<li><p>Przejdź do folderu „MQL5/Experts/”</p></li>
+<li><p>Skopiuj pliki z katalogu <code class="docutils literal notranslate"><span class="pre">Expert_Advisor</span></code> projektu do tego folderu</p></li>
+<li><p>Skompiluj EA w edytorze MetaEditor</p></li>
+</ol>
+</section>
+<section id="inicjalizacja-bazy-danych">
+<h3>5. Inicjalizacja bazy danych<a class="headerlink" href="#inicjalizacja-bazy-danych" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Użyj automatycznego skryptu inicjalizacji</span>
+poetry<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>scripts.setup_database
+</pre></div>
+</div>
+</section>
+<section id="konfiguracja-strategii-handlowej">
+<h3>6. Konfiguracja strategii handlowej<a class="headerlink" href="#konfiguracja-strategii-handlowej" title="Link to this heading"></a></h3>
+<p>Dostosuj parametry strategii handlowej w pliku <code class="docutils literal notranslate"><span class="pre">.env</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">DEFAULT_RISK_PERCENTAGE</span></code> - domyślny procent ryzyka na transakcję</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MAX_DAILY_RISK_PERCENTAGE</span></code> - maksymalny dzienny procent ryzyka</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MAX_POSITIONS</span></code> - maksymalna liczba otwartych pozycji</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TRADING_SYMBOLS</span></code> - lista par walutowych do handlu</p></li>
+</ul>
+</section>
+</section>
+<section id="uruchamianie-systemu">
+<h2>Uruchamianie systemu<a class="headerlink" href="#uruchamianie-systemu" title="Link to this heading"></a></h2>
+<p>System składa się z kilku komponentów, które można uruchomić niezależnie:</p>
+<section id="uruchomienie-agenta-handlowego">
+<h3>1. Uruchomienie agenta handlowego<a class="headerlink" href="#uruchomienie-agenta-handlowego" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>scripts.run_agent
+</pre></div>
+</div>
+</section>
+<section id="uruchomienie-dashboardu">
+<h3>2. Uruchomienie dashboardu<a class="headerlink" href="#uruchomienie-dashboardu" title="Link to this heading"></a></h3>
+<p>Aby uruchomić dashboardu, wykonaj:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>Dashboard.run_dashboard
+</pre></div>
+</div>
+<p>Domyślnie dashboard zostanie uruchomiony na porcie 5000. Aby zmienić port:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>Dashboard.run_dashboard<span class="w"> </span>--port<span class="w"> </span><span class="m">8080</span>
+</pre></div>
+</div>
+</section>
+<section id="jednorazowa-analiza-rynku">
+<h3>3. Jednorazowa analiza rynku<a class="headerlink" href="#jednorazowa-analiza-rynku" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>scripts.run_analysis<span class="w"> </span>--symbol<span class="w"> </span>EURUSD<span class="w"> </span>--timeframe<span class="w"> </span>H1
+</pre></div>
+</div>
+</section>
+</section>
+<section id="konfiguracja-produkcyjna">
+<h2>Konfiguracja produkcyjna<a class="headerlink" href="#konfiguracja-produkcyjna" title="Link to this heading"></a></h2>
+<p>W środowisku produkcyjnym zaleca się:</p>
+<ol class="arabic simple">
+<li><p>Ustawienie <code class="docutils literal notranslate"><span class="pre">TRADING_MODE=LIVE</span></code> w pliku <code class="docutils literal notranslate"><span class="pre">.env</span></code></p></li>
+<li><p>Wyłączenie debugowania: <code class="docutils literal notranslate"><span class="pre">DEBUG=False</span></code> i <code class="docutils literal notranslate"><span class="pre">FLASK_DEBUG=0</span></code></p></li>
+<li><p>Zmianę klucza <code class="docutils literal notranslate"><span class="pre">FLASK_SECRET_KEY</span></code> na bezpieczny, losowy ciąg znaków</p></li>
+<li><p>Skonfigurowanie regularnych kopii zapasowych bazy danych</p></li>
+</ol>
+</section>
+<section id="rozwiazywanie-problemow">
+<h2>Rozwiązywanie problemów<a class="headerlink" href="#rozwiazywanie-problemow" title="Link to this heading"></a></h2>
+<section id="problemy-z-polaczeniem-z-mt5">
+<h3>Problemy z połączeniem z MT5<a class="headerlink" href="#problemy-z-polaczeniem-z-mt5" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p>Upewnij się, że MT5 jest uruchomiony</p></li>
+<li><p>Sprawdź, czy EA jest prawidłowo skonfigurowany i załadowany na wykres</p></li>
+<li><p>Sprawdź poprawność danych logowania w pliku <code class="docutils literal notranslate"><span class="pre">.env</span></code></p></li>
+<li><p>Sprawdź logi w folderze <code class="docutils literal notranslate"><span class="pre">logs/</span></code></p></li>
+</ol>
+</section>
+<section id="problemy-z-api-grok">
+<h3>Problemy z API Grok<a class="headerlink" href="#problemy-z-api-grok" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p>Sprawdź poprawność klucza API</p></li>
+<li><p>Sprawdź, czy masz wystarczający limit zapytań</p></li>
+<li><p>Sprawdź połączenie internetowe</p></li>
+</ol>
+</section>
+</section>
+<section id="aktualizacja">
+<h2>Aktualizacja<a class="headerlink" href="#aktualizacja" title="Link to this heading"></a></h2>
+<p>Aby zaktualizować system do najnowszej wersji:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>pull
+poetry<span class="w"> </span>install
+python<span class="w"> </span>-m<span class="w"> </span>scripts.setup_database<span class="w"> </span>--update
+</pre></div>
+</div>
+</section>
+<section id="bezpieczenstwo">
+<h2>Bezpieczeństwo<a class="headerlink" href="#bezpieczenstwo" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Zawsze przechowuj plik <code class="docutils literal notranslate"><span class="pre">.env</span></code> w bezpiecznym miejscu</p></li>
+<li><p>Nie udostępniaj swojego klucza API</p></li>
+<li><p>Regularnie twórz kopie zapasowe bazy danych</p></li>
+<li><p>Na początku handluj na koncie demo i małymi kwotami</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="wprowadzenie.html" class="btn btn-neutral float-left" title="Wprowadzenie" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Poprzedni</a>
+        <a href="struktura_systemu.html" class="btn btn-neutral float-right" title="Struktura systemu" accesskey="n" rel="next">Następny <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Prawa zastrzeżone 2024, Mariusz.</p>
+  </div>
+
+  Zbudowano w <a href="https://www.sphinx-doc.org/">Sphinx</a> używając
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    dostarczone przez <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

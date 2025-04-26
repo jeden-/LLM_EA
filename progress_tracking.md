@@ -139,8 +139,10 @@
   - [x] Dokumentacja wdrożenia
   - [x] Skrypty instalacyjne i startowe
   - [x] Konfiguracja logowania i monitoringu
-- [ ] 5.5 Testy demo i optymalizacja (20%)
+- [ ] 5.5 Testy demo i optymalizacja (40%)
   - [x] Skrypty do diagnostyki i naprawy bazy danych
+  - [x] Skonfigurowanie zdalnego repozytorium GitHub
+  - [x] Synchronizacja projektu z repozytorium GitHub
   - [ ] Uruchomienie systemu na koncie demo
   - [ ] Monitorowanie działania przez minimum 24h
   - [ ] Optymalizacja parametrów handlowych
@@ -159,7 +161,7 @@
 | M2 | Działający mechanizm decyzyjny LLM | 2024-09-29 | ✅ Ukończony |
 | M3 | Działająca komunikacja Python-EA | 2024-10-06 | ✅ Ukończony |
 | M4 | Pełna integracja komponentów | 2024-10-20 | ✅ Ukończony |
-| M5 | Zakończone testy na koncie demo | 2024-10-27 | ⏳ W trakcie (20%) |
+| M5 | Zakończone testy na koncie demo | 2024-10-27 | ⏳ W trakcie (40%) |
 | M6 | Wdrożenie na koncie rzeczywistym | 2024-11-03 | ⏳ Nie rozpoczęty |
 
 ## Notatki postępu
@@ -343,6 +345,16 @@
 - Skrypty mogą być używane jako narzędzia proaktywnego monitoringu
 - Zaktualizowano dokumentację skryptów w katalogu scripts
 
+### 2024-10-01: Synchronizacja z repozytorium GitHub
+- Skonfigurowano zdalne repozytorium GitHub (https://github.com/jeden-/LLM_EA.git)
+- Dodano wszystkie pliki projektu do repozytorium Git
+- Wykonano pierwszy commit z komunikatem "Inicjalna wersja projektu LLM_EA"
+- Wypchnięto zmiany do zdalnego repozytorium GitHub
+- Zaktualizowano .gitignore o pliki tymczasowe i konfiguracyjne
+- Zweryfikowano poprawność synchronizacji
+- Zaktualizowano dokumentację o informacje dotyczące repozytorium GitHub
+- Rozpoczęto przygotowania do uruchomienia systemu na koncie demo MT5
+
 ## Problemy i wyzwania
 
 | ID | Opis problemu | Status | Rozwiązanie |
@@ -363,16 +375,134 @@
 
 | Miara | Wartość | Data aktualizacji |
 |-------|---------|-------------------|
-| Procent ukończenia | 93% | 2024-09-30 |
-| Liczba zaimplementowanych komponentów | 25/26 | 2024-09-30 |
-| Liczba ukończonych kamieni milowych | 4/7 | 2024-09-30 |
-| Łączna liczba testów | 146 | 2024-09-30 |
+| Procent ukończenia | 95% | 2024-10-01 |
+| Liczba zaimplementowanych komponentów | 25/26 | 2024-10-01 |
+| Liczba ukończonych kamieni milowych | 4/7 | 2024-10-01 |
+| Łączna liczba testów | 146 | 2024-10-01 |
 
 ## Następne kroki
 
-1. Uruchomienie systemu na koncie demo i monitoring działania (punkt 5.5)
-2. Automatyzacja diagnostyki bazy danych (integracja z monitorowaniem systemu)
-3. Konfiguracja środowiska produkcyjnego (punkt 6.1)
-4. Wdrożenie na koncie rzeczywistym (punkt 6.2)
+1. Utworzenie dokumentacji konta demo MT5 (docs/konto_demo.md)
+2. Uruchomienie systemu na koncie demo i monitoring działania (punkt 5.5)
+3. Automatyzacja diagnostyki bazy danych (integracja z monitorowaniem systemu)
+4. Konfiguracja środowiska produkcyjnego (punkt 6.1)
 
 *Tu będą aktualizowane następne kroki w miarę postępu prac...* 
+
+## Plan testów
+
+### 1. Testy integracyjne (rozszerzenie)
+- [ ] **TI-01**: Test integracji LLM_Engine z MT5_Connector (0%)
+  - [ ] Weryfikacja poprawnego przepływu danych rynkowych z MT5_Connector do LLM_Engine
+  - [ ] Testowanie przekazywania danych z różnymi ramami czasowymi i instrumentami
+  - [ ] Sprawdzenie obsługi błędów połączenia i opóźnień w dostarczaniu danych
+  - [ ] Weryfikacja poprawności obliczania i przekazywania wskaźników technicznych
+
+- [ ] **TI-02**: Test integracji Agent_Manager z Database (0%)
+  - [ ] Weryfikacja zapisu i odczytu analiz rynkowych
+  - [ ] Testowanie zarządzania pomysłami handlowymi (zapis, aktualizacja, odczyt)
+  - [ ] Sprawdzenie obsługi współbieżnego dostępu do bazy danych
+  - [ ] Testowanie transakcji bazodanowych i mechanizmów rollback
+
+- [ ] **TI-03**: Test integracji OrderProcessor z MT5_Connector (0%)
+  - [ ] Weryfikacja poprawnego przesyłania zleceń handlowych
+  - [ ] Testowanie aktualizacji statusów zleceń
+  - [ ] Sprawdzenie obsługi błędów i odrzuconych zleceń
+  - [ ] Weryfikacja mechanizmu ponownych prób wysyłania zleceń
+
+- [ ] **TI-04**: Test integracji komponentów w pełnym cyklu przetwarzania (0%)
+  - [ ] Testowanie przepływu danych przez wszystkie moduły
+  - [ ] Weryfikacja spójności danych między komponentami
+  - [ ] Sprawdzenie współpracy wszystkich modułów w scenariuszu E2E
+  - [ ] Testowanie obsługi błędów na różnych etapach przetwarzania
+
+### 2. Testy end-to-end (rozszerzenie)
+- [ ] **E2E-01**: Test scenariusza trendu wzrostowego (0%)
+  - [ ] Przygotowanie danych symulujących silny trend wzrostowy
+  - [ ] Weryfikacja analizy rynku i generowania sygnału kupna
+  - [ ] Testowanie wykonania zlecenia i zarządzania pozycją
+  - [ ] Sprawdzenie realizacji zysku przy osiągnięciu take profit
+
+- [ ] **E2E-02**: Test scenariusza trendu spadkowego (0%)
+  - [ ] Przygotowanie danych symulujących silny trend spadkowy
+  - [ ] Weryfikacja analizy rynku i generowania sygnału sprzedaży
+  - [ ] Testowanie wykonania zlecenia i zarządzania pozycją
+  - [ ] Sprawdzenie realizacji zysku przy osiągnięciu take profit
+
+- [ ] **E2E-03**: Test scenariusza konsolidacji i wybicia (0%)
+  - [ ] Przygotowanie danych symulujących konsolidację i wybicie
+  - [ ] Weryfikacja analizy rynku podczas konsolidacji (brak sygnałów)
+  - [ ] Testowanie identyfikacji wybicia i generowania odpowiedniego sygnału
+  - [ ] Sprawdzenie zarządzania pozycją po wystąpieniu wybicia
+
+- [ ] **E2E-04**: Test wielu instrumentów jednocześnie (0%)
+  - [ ] Przygotowanie danych dla wielu instrumentów w różnych fazach rynku
+  - [ ] Weryfikacja analizy i generowania sygnałów dla wielu instrumentów
+  - [ ] Testowanie zarządzania wieloma pozycjami jednocześnie
+  - [ ] Sprawdzenie alokacji kapitału między instrumentami
+
+### 3. Testy niezawodności
+- [ ] **TN-01**: Test automatycznego odzyskiwania po utracie połączenia z MT5 (0%)
+  - [ ] Symulacja utraty połączenia z platformą MT5
+  - [ ] Weryfikacja mechanizmu wykrywania utraty połączenia
+  - [ ] Testowanie procedury automatycznego ponownego łączenia
+  - [ ] Sprawdzenie stanu systemu po przywróceniu połączenia
+
+- [ ] **TN-02**: Test odporności na błędy API LLM (0%)
+  - [ ] Symulacja błędów API Grok (timeout, 500, 429)
+  - [ ] Weryfikacja mechanizmu ponownych prób z backoff
+  - [ ] Testowanie alternatywnych ścieżek przetwarzania
+  - [ ] Sprawdzenie logowania błędów i powiadomień
+
+- [ ] **TN-03**: Test trwałości danych podczas awarii (0%)
+  - [ ] Symulacja nagłego zamknięcia aplikacji podczas operacji na bazie danych
+  - [ ] Weryfikacja integralności bazy danych po awarii
+  - [ ] Testowanie mechanizmów transakcji i rollback
+  - [ ] Sprawdzenie automatycznego przywracania spójności danych
+
+- [ ] **TN-04**: Test mechanizmów monitorowania i samodzielnej naprawy (0%)
+  - [ ] Weryfikacja wykrywania błędów i anomalii w działaniu systemu
+  - [ ] Testowanie procedur automatycznej naprawy problemów z bazą danych
+  - [ ] Sprawdzenie mechanizmów alarmowych i powiadomień
+  - [ ] Weryfikacja raportowania błędów i diagnostyki
+
+### 4. Testy backtestingowe
+- [ ] **TB-01**: Backtest na historycznych danych trendu wzrostowego (0%)
+  - [ ] Przygotowanie rzeczywistych danych historycznych dla trendu wzrostowego
+  - [ ] Wykonanie backtestów z różnymi parametrami ryzyka
+  - [ ] Analiza wyników: skuteczność sygnałów, stosunek zysku do ryzyka
+  - [ ] Optymalizacja parametrów na podstawie wyników
+
+- [ ] **TB-02**: Backtest na historycznych danych trendu spadkowego (0%)
+  - [ ] Przygotowanie rzeczywistych danych historycznych dla trendu spadkowego
+  - [ ] Wykonanie backtestów z różnymi parametrami ryzyka
+  - [ ] Analiza wyników: skuteczność sygnałów, stosunek zysku do ryzyka
+  - [ ] Optymalizacja parametrów na podstawie wyników
+
+- [ ] **TB-03**: Backtest na historycznych danych konsolidacji (0%)
+  - [ ] Przygotowanie rzeczywistych danych historycznych dla konsolidacji
+  - [ ] Wykonanie backtestów z różnymi parametrami ryzyka
+  - [ ] Analiza wyników: liczba fałszywych sygnałów, skuteczność identyfikacji wybić
+  - [ ] Optymalizacja parametrów na podstawie wyników
+
+- [ ] **TB-04**: Backtest na historycznych danych wysokiej zmienności (0%)
+  - [ ] Przygotowanie rzeczywistych danych historycznych dla okresów wysokiej zmienności
+  - [ ] Wykonanie backtestów z różnymi parametrami ryzyka
+  - [ ] Analiza wyników: skuteczność zarządzania ryzykiem, ochrona kapitału
+  - [ ] Optymalizacja parametrów na podstawie wyników
+
+- [ ] **TB-05**: Porównanie skuteczności na różnych ramach czasowych (0%)
+  - [ ] Przeprowadzenie backtestów na danych M5, M15, H1, H4, D1
+  - [ ] Analiza porównawcza skuteczności sygnałów w różnych ramach czasowych
+  - [ ] Identyfikacja optymalnych ram czasowych dla różnych instrumentów
+  - [ ] Opracowanie strategii multi-timeframe na podstawie wyników
+
+## Podsumowanie planu testów
+
+| Kategoria testów | Liczba testów | Status |
+|------------------|---------------|--------|
+| Testy integracyjne | 4 | 0% |
+| Testy end-to-end | 4 | 0% |
+| Testy niezawodności | 4 | 0% |
+| Testy backtestingowe | 5 | 0% |
+| **Łącznie** | **17** | **0%** | 

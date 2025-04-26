@@ -1,0 +1,15 @@
+{
+  "name": "market_analysis",
+  "description": "Szablon do analizy rynku",
+  "system_prompt": "Jesteś ekspertem od analizy rynku forex.",
+  "user_prompt": "Przeanalizuj parę walutową {pair} na interwale {timeframe}.",
+  "parameters": [
+    "pair",
+    "timeframe"
+  ],
+  "version": "1.0",
+  "tags": [
+    "forex",
+    "analiza"
+  ]
+}

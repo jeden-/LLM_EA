@@ -73,46 +73,60 @@ class LLMClient:
             self.cache_hits = 0
             self.cache_misses = 0
     
-    def _generate_cache_key(self, model: str, prompt: str, options: Dict[str, Any]) -> str:
+    def _generate_cache_key(self, model: str, prompt: str, options: dict = None) -> str:
         """
-        Generuje klucz cache na podstawie modelu, promptu i opcji.
+        Generuje unikalny klucz cache dla danego zapytania.
         
         Args:
             model: Nazwa modelu
             prompt: Tekst promptu
-            options: Opcje generowania
+            options: Dodatkowe opcje (system prompt, temperatura, etc.)
             
         Returns:
-            Klucz cache (hash MD5)
+            str: Unikalny klucz cache
         """
-        if self.aggressive_caching:
-            # W agresywnym cachowaniu ignorujemy niektóre mniej istotne parametry
-            # Usuwamy lub normalizujemy parametry, które nie powinny wpływać na wynik
-            simplified_options = options.copy()
-            # Usuwanie parametrów, które nie wpływają istotnie na wynik
-            for param in ['num_ctx', 'repeat_penalty', 'seed']:
-                if param in simplified_options:
-                    del simplified_options[param]
-            
-            # Zaokrąglenie temperature do 1 miejsca po przecinku
-            if 'temperature' in simplified_options:
-                simplified_options['temperature'] = round(simplified_options['temperature'], 1)
-            
-            # Normalizacja systemu (usunięcie białych znaków)
-            if 'system' in simplified_options:
-                simplified_options['system'] = simplified_options['system'].strip()
-            
-            # Normalizacja tekstu promptu (usunięcie nadmiarowych białych znaków)
-            normalized_prompt = ' '.join(prompt.split())
-            
-            # Generowanie klucza cache
-            cache_str = f"{model}_{normalized_prompt}_{json.dumps(simplified_options, sort_keys=True)}"
-        else:
-            # Standardowe cachowanie z pełnym kluczem
-            cache_str = f"{model}_{prompt}_{json.dumps(options, sort_keys=True)}"
+        # Normalizacja promptu - usunięcie nadmiarowych białych znaków
+        normalized_prompt = " ".join(prompt.split())
         
-        # Generowanie hasha MD5
-        return hashlib.md5(cache_str.encode('utf-8')).hexdigest()
+        # Przygotowanie podstawowych danych do hasha
+        data = {
+            "model": model,
+            "prompt": normalized_prompt
+        }
+        
+        # Dodanie znormalizowanych opcji
+        if options:
+            normalized_options = {}
+            
+            # Normalizacja system promptu
+            if "system" in options and options["system"]:
+                normalized_options["system"] = " ".join(options["system"].split())
+                
+            # Zaokrąglenie temperatury do 1 miejsca po przecinku w trybie agresywnym
+            # lub do 2 miejsc w trybie normalnym
+            if "temperature" in options:
+                temp = float(options["temperature"])
+                if self.aggressive_caching:
+                    normalized_options["temperature"] = round(temp, 1)
+                else:
+                    normalized_options["temperature"] = round(temp, 2)
+                
+            # W trybie agresywnym ignorujemy niektóre parametry
+            if not self.aggressive_caching:
+                # Dodanie max_tokens bez normalizacji
+                if "max_tokens" in options and options["max_tokens"]:
+                    normalized_options["max_tokens"] = options["max_tokens"]
+                    
+                # Dodanie innych parametrów
+                for key in options:
+                    if key not in ["system", "temperature", "max_tokens"]:
+                        normalized_options[key] = options[key]
+                
+            data["options"] = normalized_options
+            
+        # Generowanie hasha
+        serialized = json.dumps(data, sort_keys=True)
+        return hashlib.sha256(serialized.encode()).hexdigest()
     
     def _get_cache_path(self, cache_key: str) -> Path:
         """
@@ -159,7 +173,7 @@ class LLMClient:
             return None
             
         cache_path = self._get_cache_path(cache_key)
-        if not cache_path.exists():
+        if not os.path.exists(str(cache_path)):
             # Cache miss
             self.cache_misses += 1
             return None
@@ -193,107 +207,77 @@ class LLMClient:
                 max_tokens: Optional[int] = None,
                 stream: bool = False) -> Dict[str, Any]:
         """
-        Generuje odpowiedź LLM.
+        Generuje odpowiedź na podstawie promptu.
         
         Args:
-            prompt: Prompt główny
-            model: Nazwa modelu (opcjonalnie, nadpisuje domyślny)
+            prompt: Tekst promptu
+            model: Nazwa modelu (opcjonalnie, domyślnie używa model_name z inicjalizacji)
             system_prompt: Prompt systemowy (opcjonalnie)
             temperature: Temperatura generowania (opcjonalnie)
             max_tokens: Maksymalna liczba tokenów (opcjonalnie)
-            stream: Czy używać strumieniowania (obecnie nieobsługiwane)
+            stream: Czy używać streamowania (domyślnie False)
             
         Returns:
-            Odpowiedź LLM
-            
-        Raises:
-            Exception: W przypadku błędu komunikacji z API
+            Słownik z odpowiedzią i metadanymi
         """
+        # Użyj domyślnych wartości, jeśli nie podano
         model = model or self.model_name
         temperature = temperature if temperature is not None else self.temperature
         max_tokens = max_tokens if max_tokens is not None else self.max_tokens
         
-        # Przygotowanie parametrów żądania
+        # Sprawdzenie rozmiaru promptu
+        prompt_size = len(prompt)
+        logger.info(f"Rozmiar promptu: {prompt_size} znaków")
+
+        # Przygotuj payload
         payload = {
             "model": model,
             "prompt": prompt,
-            "stream": False,  # Obecnie nie obsługujemy strumienia
             "options": {
                 "temperature": temperature,
             }
         }
         
-        # Dodanie prompta systemowego, jeśli podano
-        if system_prompt:
-            payload["system"] = system_prompt
-            
-        # Dodanie max_tokens, jeśli podano
         if max_tokens:
             payload["options"]["num_predict"] = max_tokens
             
-        # Sprawdzenie cache
-        options = payload.get("options", {})
-        cache_key = self._generate_cache_key(model, prompt, {
-            "system": system_prompt,
-            "options": options
-        })
-        
-        # Sprawdzenie rozmiaru promptu
-        prompt_size = len(prompt)
-        logger.info(f"Rozmiar promptu: {prompt_size} znaków")
-        
-        # Próba załadowania z cache
-        cached_response = self._load_from_cache(cache_key)
-        if cached_response:
-            logger.info(f"Znaleziono odpowiedź w cache (klucz: {cache_key[:8]}...)")
-            return cached_response
-        
-        logger.info(f"Brak odpowiedzi w cache, generowanie nowej (klucz: {cache_key[:8]}...)")
+        if system_prompt:
+            payload["options"]["system"] = system_prompt
             
-        # Wykonanie żądania z obsługą ponownych prób
-        url = f"{self.base_url}/api/generate"
-        retry_count = 0
-        response = None
-        
-        # Mierzenie całkowitego czasu generowania
+        # Sprawdź cache przed generowaniem
+        if self.use_cache and not stream:
+            cache_key = self._generate_cache_key(model, prompt, {
+                "system": system_prompt,
+                "temperature": temperature,
+                "max_tokens": max_tokens
+            })
+            cached_response = self._load_from_cache(cache_key)
+            if cached_response:
+                return cached_response
+            
+            logger.info(f"Brak odpowiedzi w cache, generowanie nowej (klucz: {cache_key[:8]}...)")
+
+        # Inicjalizacja zmiennych dla ponowień
         total_start_time = time.time()
+        retry_count = 0
         
-        while retry_count <= self.max_retries:
+        while True:
             try:
-                logger.info(f"Wysyłanie żądania do {url} z modelem {model}")
-                headers = {"Content-Type": "application/json"}
-                
-                start_time = time.time()
+                # Wysłanie żądania do API
                 response = requests.post(
-                    url, 
-                    headers=headers,
+                    f"{self.base_url}/api/generate",
                     json=payload,
-                    timeout=self.timeout
+                    timeout=self.timeout,
+                    stream=stream
                 )
-                end_time = time.time()
-                
-                # Logowanie czasu wykonania
-                duration = end_time - start_time
-                logger.info(f"Odpowiedź otrzymana w {duration:.2f}s")
-                
-                # Sprawdzenie statusu odpowiedzi
                 response.raise_for_status()
                 
-                # Parsowanie odpowiedzi JSON
+                # Parsowanie odpowiedzi
                 result = response.json()
                 
-                # Dodanie metadanych o wydajności
-                if isinstance(result, dict) and "_metadata" not in result:
-                    result["_metadata"] = {}
-                    
-                result["_metadata"]["generation_time"] = duration
-                result["_metadata"]["prompt_size"] = prompt_size
-                result["_metadata"]["response_size"] = len(result.get("response", ""))
-                result["_metadata"]["timestamp"] = time.time()
-                result["_metadata"]["model"] = model
-                
-                # Zapisanie do cache
-                self._save_to_cache(cache_key, result)
+                # Zapisz do cache jeśli włączone
+                if self.use_cache and not stream and 'cache_key' in locals():
+                    self._save_to_cache(cache_key, result)
                 
                 return result
                 

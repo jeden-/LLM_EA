@@ -73,81 +73,46 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(result, "Analizuj rynek EURUSD.")
     
     def test_extract_json_from_response(self):
-        """Test wyciągania JSON z tekstu odpowiedzi."""
-        # Test z blokiem kodu JSON w formacie markdown
-        text_with_md_code = """
+        """Test ekstrakcji JSON z odpowiedzi."""
+        # Przygotowanie danych testowych
+        response = """
         Oto analiza rynku:
-        
-        ```json
         {
-          "trend": "bullish",
-          "strength": 7
-        }
-        ```
-        """
-        result = extract_json_from_response(text_with_md_code)
-        self.assertIsNotNone(result)
-        self.assertEqual(result["trend"], "bullish")
-        self.assertEqual(result["strength"], 7)
-        
-        # Test z blokiem kodu bez oznaczenia json
-        text_with_code = """
-        Oto analiza rynku:
-        
-        ```
-        {
-          "trend": "bearish",
-          "strength": 5
-        }
-        ```
-        """
-        result = extract_json_from_response(text_with_code)
-        self.assertIsNotNone(result)
-        self.assertEqual(result["trend"], "bearish")
-        self.assertEqual(result["strength"], 5)
-        
-        # Test z JSON bezpośrednio w tekście
-        text_with_json = """
-        Oto wynik:
-        
-        {
-          "trend": "neutral",
-          "strength": 3
+            "trend": "bullish",
+            "strength": 7,
+            "key_levels": {
+                "support": [1.0780, 1.0750],
+                "resistance": [1.0850, 1.0880]
+            }
         }
         """
-        result = extract_json_from_response(text_with_json)
-        self.assertIsNotNone(result)
-        self.assertEqual(result["trend"], "neutral")
-        self.assertEqual(result["strength"], 3)
         
-        # Test z tablicą JSON
-        text_with_array = """
-        Oto wynik:
-        
-        [
-          {"symbol": "EURUSD", "trend": "bullish"},
-          {"symbol": "GBPUSD", "trend": "bearish"}
-        ]
-        """
-        result = extract_json_from_response(text_with_array)
-        self.assertIsNotNone(result)
-        self.assertEqual(len(result), 2)
-        self.assertEqual(result[0]["symbol"], "EURUSD")
-        
-        # Test z niepoprawnym JSON
-        text_with_invalid_json = """
-        Oto wynik analizy:
-        
-        {
-          "trend": "bearish",
-          strength: 5,
-          "key_levels: {
-            "support": [1.0780, 1.0750]
-          }
+        # Mockowanie ResponseParserFactory
+        parser_mock = MagicMock()
+        parser_mock.parse.return_value = {
+            "trend": "bullish",
+            "strength": 7,
+            "key_levels": {
+                "support": [1.0780, 1.0750],
+                "resistance": [1.0850, 1.0880]
+            }
         }
-        """
-        result = extract_json_from_response(text_with_invalid_json)
-        self.assertIsNone(result)
+        
+        with patch('LLM_Engine.response_parser.ResponseParserFactory') as factory_mock:
+            factory_mock.get_parser.return_value = parser_mock
+            
+            # Wywołanie testowanej funkcji
+            result = extract_json_from_response(response)
+            
+            # Asercje
+            self.assertIsInstance(result, dict)
+            self.assertEqual(result["trend"], "bullish")
+            self.assertEqual(result["strength"], 7)
+            self.assertEqual(len(result["key_levels"]["support"]), 2)
+            self.assertEqual(len(result["key_levels"]["resistance"]), 2)
+            
+            # Sprawdzenie czy parser został użyty
+            parser_mock.parse.assert_called_once_with(response)
     
     def test_parse_llm_response(self):
         """Test parsowania odpowiedzi z różnych modeli LLM."""

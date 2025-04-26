@@ -175,4 +175,69 @@ class TechnicalIndicators:
         upper_band = middle_band + (rolling_std * num_std)
         lower_band = middle_band - (rolling_std * num_std)
         
-        return upper_band, middle_band, lower_band 
+        return upper_band, middle_band, lower_band
+
+class CalculateIndicators(TechnicalIndicators):
+    """
+    Klasa rozszerzająca TechnicalIndicators o dodatkowe funkcjonalności.
+    Służy jako główny interfejs do obliczania wskaźników technicznych w systemie.
+    """
+    
+    def __init__(self):
+        """Inicjalizacja klasy CalculateIndicators."""
+        super().__init__()
+        
+    def calculate_ma(self, price_series: pd.Series, period: int) -> pd.Series:
+        """
+        Alias dla calculate_sma dla zachowania kompatybilności.
+        
+        Args:
+            price_series: Seria danych cenowych
+            period: Okres dla średniej kroczącej
+            
+        Returns:
+            pd.Series: Seria z obliczoną średnią kroczącą
+        """
+        return self.calculate_sma(price_series, period)
+        
+    def calculate_all_indicators(self, data: pd.DataFrame) -> Dict[str, Any]:
+        """
+        Oblicza wszystkie dostępne wskaźniki techniczne dla danych wejściowych.
+        
+        Args:
+            data: DataFrame z danymi cenowymi (OHLCV)
+            
+        Returns:
+            Dict[str, Any]: Słownik zawierający wszystkie obliczone wskaźniki
+        """
+        if data is None or data.empty:
+            logger.warning("Otrzymano puste dane wejściowe")
+            return {}
+            
+        try:
+            close_prices = data['close']
+            
+            # Obliczenie podstawowych wskaźników
+            indicators = {
+                'sma_20': self.calculate_sma(close_prices, 20),
+                'sma_50': self.calculate_sma(close_prices, 50),
+                'sma_200': self.calculate_sma(close_prices, 200),
+                'ema_12': self.calculate_ema(close_prices, 12),
+                'ema_26': self.calculate_ema(close_prices, 26),
+                'rsi': self.calculate_rsi(close_prices),
+                'macd': self.calculate_macd(close_prices)
+            }
+            
+            # Obliczenie Bollinger Bands
+            upper, middle, lower = self.calculate_bollinger_bands(close_prices)
+            indicators.update({
+                'bb_upper': upper,
+                'bb_middle': middle,
+                'bb_lower': lower
+            })
+            
+            return indicators
+            
+        except Exception as e:
+            logger.error(f"Błąd podczas obliczania wskaźników: {e}")
+            return {} 

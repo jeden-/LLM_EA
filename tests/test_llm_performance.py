@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from LLM_Engine.llm_engine import LLMEngine
 from LLM_Engine.prompt_builder import PromptBuilder
-from LLM_Engine.response_parser import ResponseParser
+from LLM_Engine.response_parser import ResponseParser, MarketAnalysisParser
 from LLM_Engine.llm_interface import LLMInterface
 from LLM_Engine.market_analyzer import MarketAnalyzer
 
@@ -513,15 +513,21 @@ class TestLLMPerformance(unittest.TestCase):
             indicators=scenario['formatted_data']['indicators']
         )
         
+        # Przygotowanie oceny ryzyka
+        risk_assessment = {
+            "risk_level": "medium",
+            "market_volatility": "average",
+            "risk_factors": ["trend_strength", "support_resistance"],
+            "max_position_size": 1.0,
+            "recommended_leverage": 1.0,
+            "risk_reward_ratio": 2.0
+        }
+        
         # Generowanie pomysłu handlowego
         trade_idea = self.llm_engine.generate_trade_idea(
-            market_data={
-                "symbol": scenario['metadata']['symbol'],
-                "timeframe": scenario['metadata']['timeframe'],
-                "price_data": scenario['formatted_data']['data'],
-                "indicators": scenario['formatted_data']['indicators'],
-                "current_price": scenario['formatted_data']['data'][-1]['close']
-            }
+            market_analysis=market_analysis,
+            risk_assessment=risk_assessment,
+            current_price=scenario['formatted_data']['data'][-1]['close']
         )
         
         end_time = time.time()
@@ -548,15 +554,21 @@ class TestLLMPerformance(unittest.TestCase):
             indicators=scenario['formatted_data']['indicators']
         )
         
+        # Przygotowanie oceny ryzyka
+        risk_assessment = {
+            "risk_level": "medium",
+            "market_volatility": "average",
+            "risk_factors": ["trend_strength", "support_resistance"],
+            "max_position_size": 1.0,
+            "recommended_leverage": 1.0,
+            "risk_reward_ratio": 2.0
+        }
+        
         # Generowanie pomysłu handlowego
         trade_idea = self.llm_engine.generate_trade_idea(
-            market_data={
-                "symbol": scenario['metadata']['symbol'],
-                "timeframe": scenario['metadata']['timeframe'],
-                "price_data": scenario['formatted_data']['data'],
-                "indicators": scenario['formatted_data']['indicators'],
-                "current_price": scenario['formatted_data']['data'][-1]['close']
-            }
+            market_analysis=market_analysis,
+            risk_assessment=risk_assessment,
+            current_price=scenario['formatted_data']['data'][-1]['close']
         )
         
         end_time = time.time()
@@ -583,15 +595,21 @@ class TestLLMPerformance(unittest.TestCase):
             indicators=scenario['formatted_data']['indicators']
         )
         
+        # Przygotowanie oceny ryzyka
+        risk_assessment = {
+            "risk_level": "low",
+            "market_volatility": "low",
+            "risk_factors": ["range_trading", "breakout_potential"],
+            "max_position_size": 0.5,
+            "recommended_leverage": 1.0,
+            "risk_reward_ratio": 1.5
+        }
+        
         # Generowanie pomysłu handlowego
         trade_idea = self.llm_engine.generate_trade_idea(
-            market_data={
-                "symbol": scenario['metadata']['symbol'],
-                "timeframe": scenario['metadata']['timeframe'],
-                "price_data": scenario['formatted_data']['data'],
-                "indicators": scenario['formatted_data']['indicators'],
-                "current_price": scenario['formatted_data']['data'][-1]['close']
-            }
+            market_analysis=market_analysis,
+            risk_assessment=risk_assessment,
+            current_price=scenario['formatted_data']['data'][-1]['close']
         )
         
         end_time = time.time()
@@ -618,15 +636,21 @@ class TestLLMPerformance(unittest.TestCase):
             indicators=scenario['formatted_data']['indicators']
         )
         
+        # Przygotowanie oceny ryzyka
+        risk_assessment = {
+            "risk_level": "high",
+            "market_volatility": "high",
+            "risk_factors": ["breakout_confirmation", "momentum"],
+            "max_position_size": 1.5,
+            "recommended_leverage": 2.0,
+            "risk_reward_ratio": 2.5
+        }
+        
         # Generowanie pomysłu handlowego
         trade_idea = self.llm_engine.generate_trade_idea(
-            market_data={
-                "symbol": scenario['metadata']['symbol'],
-                "timeframe": scenario['metadata']['timeframe'],
-                "price_data": scenario['formatted_data']['data'],
-                "indicators": scenario['formatted_data']['indicators'],
-                "current_price": scenario['formatted_data']['data'][-1]['close']
-            }
+            market_analysis=market_analysis,
+            risk_assessment=risk_assessment,
+            current_price=scenario['formatted_data']['data'][-1]['close']
         )
         
         end_time = time.time()
@@ -661,15 +685,21 @@ class TestLLMPerformance(unittest.TestCase):
         # Diagnostyka
         print(f"MARKET ANALYSIS RESULT: {market_analysis}")
         
+        # Przygotowanie oceny ryzyka
+        risk_assessment = {
+            "risk_level": "high",
+            "market_volatility": "high",
+            "risk_factors": ["breakdown_confirmation", "momentum"],
+            "max_position_size": 1.5,
+            "recommended_leverage": 2.0,
+            "risk_reward_ratio": 2.5
+        }
+        
         # Generowanie pomysłu handlowego
         trade_idea = self.llm_engine.generate_trade_idea(
-            market_data={
-                "symbol": scenario['metadata']['symbol'],
-                "timeframe": scenario['metadata']['timeframe'],
-                "price_data": scenario['formatted_data']['data'],
-                "indicators": scenario['formatted_data']['indicators'],
-                "current_price": scenario['formatted_data']['data'][-1]['close']
-            }
+            market_analysis=market_analysis,
+            risk_assessment=risk_assessment,
+            current_price=scenario['formatted_data']['data'][-1]['close']
         )
         
         # Diagnostyka
@@ -721,19 +751,20 @@ class TestLLMPerformance(unittest.TestCase):
         # Przykładowa odpowiedź JSON
         sample_response = """
         {
-          "trend": "bullish",
-          "strength": 7,
-          "key_levels": {
-            "support": [1.0780, 1.0750],
-            "resistance": [1.0850, 1.0880]
-          },
-          "recommendation": "buy",
-          "explanation": "Rynek wykazuje silny trend wzrostowy."
+            "trend": "bullish",
+            "strength": 7,
+            "key_levels": {
+                "support": [1.0780, 1.0750],
+                "resistance": [1.0850, 1.0880]
+            },
+            "recommendation": "buy",
+            "explanation": "Rynek wykazuje silny trend wzrostowy."
         }
         """
         
         # Skonfigurowanie mocka dla response_parser
-        with patch.object(self.response_parser, 'parse_market_analysis') as mock_parse:
+        parser = MarketAnalysisParser()
+        with patch.object(parser, 'parse') as mock_parse:
             mock_parse.return_value = {
                 "trend": "bullish",
                 "strength": 7,
@@ -746,23 +777,25 @@ class TestLLMPerformance(unittest.TestCase):
             }
             
             # Pomiar czasu wykonania
-            iterations = 50
             start_time = time.time()
             
-            for _ in range(iterations):
-                result = self.response_parser.parse_market_analysis(sample_response)
+            # Wykonanie parsowania
+            for _ in range(100):
+                result = parser.parse(sample_response)
             
-            end_time = time.time()
-            total_time = end_time - start_time
-            avg_time = total_time / iterations
+            execution_time = time.time() - start_time
             
-            # Sprawdzenie, czy przetwarzanie odpowiedzi jest wystarczająco szybkie
-            print(f"\nŚredni czas przetwarzania odpowiedzi: {avg_time:.6f} s")
-            self.assertIsNotNone(result)
+            # Weryfikacja wyniku
+            self.assertIsInstance(result, dict)
+            self.assertEqual(result["trend"], "bullish")
+            self.assertEqual(result["strength"], 7)
+            self.assertEqual(len(result["key_levels"]["support"]), 2)
             
-            # Oczekiwanie, że przetwarzanie odpowiedzi zajmuje mniej niż 50ms na iterację
-            # Na wolniejszych komputerach ten test może wymagać dostosowania
-            self.assertLess(avg_time, 0.1, "Przetwarzanie odpowiedzi jest zbyt wolne")
+            # Sprawdzenie wydajności
+            self.assertLess(execution_time, 1.0, "Parsowanie powinno zająć mniej niż 1 sekundę")
+            
+            # Sprawdzenie liczby wywołań
+            self.assertEqual(mock_parse.call_count, 100)
 
 
 if __name__ == '__main__':

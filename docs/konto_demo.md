@@ -74,11 +74,26 @@ Komenda ta utworzy bazę danych i wypełni ją przykładowymi danymi do testów.
 
 ### 2. Uruchom komponenty systemu LLM Trading
 
-Możesz uruchomić cały system za pomocą jednego skryptu:
+#### Opcja 1: Automatyczne uruchomienie wszystkich komponentów
+
+Możesz uruchomić cały system za pomocą dedykowanego skryptu do testów demo:
 
 ```bash
-python scripts/run_system.py --env dev --debug
+python scripts/run_demo_test.py --env dev --duration 24 --symbols EURUSD,GBPUSD,USDJPY --verbose
 ```
+
+Parametry skryptu:
+- `--env` - środowisko, w którym ma być uruchomiony system (dev, test, prod)
+- `--duration` - czas trwania testu w godzinach (domyślnie: 24)
+- `--symbols` - lista par walutowych do monitorowania (domyślnie: EURUSD,GBPUSD,USDJPY)
+- `--port` - port, na którym ma być uruchomiony dashboard (domyślnie: 5000)
+- `--no-dashboard` - nie uruchamiaj dashboardu (opcjonalnie)
+- `--verbose` - wyświetlaj więcej informacji diagnostycznych
+- `--debug` - uruchom w trybie debugowania
+
+Skrypt automatycznie uruchomi wszystkie komponenty systemu, będzie monitorował ich działanie i zbierał statystyki. Po zakończeniu testu (po upływie określonego czasu lub po przerwaniu), skrypt wygeneruje raport z podstawowymi statystykami.
+
+#### Opcja 2: Ręczne uruchomienie komponentów
 
 Alternatywnie możesz uruchamiać komponenty pojedynczo (w oddzielnych oknach terminala):
 
@@ -93,7 +108,7 @@ python MT5_Connector/run_connector.py --env dev
 python LLM_Engine/run_engine.py --env dev
 
 # Uruchom agenta zarządzającego
-python Agent_Manager/run_agent.py --env dev
+python Agent_Manager/run_manager.py --env dev
 
 # Uruchom dashboard
 python Dashboard/run_dashboard.py --env dev --port 5000
@@ -127,6 +142,29 @@ Dodatkowo, możesz regularnie sprawdzać integralność bazy danych:
 python scripts/check_database.py --env dev
 ```
 
+## Analiza wyników testów
+
+Po zakończeniu testów na koncie demo możesz przeanalizować wyniki za pomocą skryptu `analyze_demo_results.py`:
+
+```bash
+python scripts/analyze_demo_results.py --env dev --output-dir data/reports --verbose
+```
+
+Parametry skryptu:
+- `--env` - środowisko, z którego mają być analizowane dane (dev, test, prod)
+- `--test-id` - ID testu do analizy (domyślnie: najnowszy)
+- `--output-dir` - katalog, w którym mają być zapisane raporty (domyślnie: data/reports)
+- `--verbose` - wyświetlaj więcej informacji diagnostycznych
+- `--debug` - uruchom w trybie debugowania
+
+Skrypt generuje szczegółowy raport HTML z:
+- Statystykami transakcji
+- Wykresami wyników według par walutowych, kierunków i godzin handlu
+- Rekomendacjami dotyczącymi optymalizacji parametrów handlowych
+- Analizą pomysłów handlowych i czasów przetwarzania
+
+Wygenerowany raport znajdziesz w katalogu `data/reports/` (lub innym wskazanym w parametrze `--output-dir`).
+
 ## Testowanie na koncie demo
 
 1. Po uruchomieniu systemu, obserwuj analizy rynkowe generowane przez silnik LLM
@@ -135,13 +173,33 @@ python scripts/check_database.py --env dev
 4. Sprawdzaj logi systemu w katalogu `logs/` aby zdiagnozować ewentualne problemy
 5. Po 24 godzinach działania przeanalizuj wyniki i dostosuj parametry systemu
 
+## Optymalizacja parametrów handlowych
+
+Na podstawie wyników testów możesz dostosować następujące parametry:
+
+1. W pliku `.env`:
+   - `DEFAULT_RISK_PERCENTAGE` - domyślny procent kapitału na pojedynczą transakcję
+   - `MAX_DAILY_RISK_PERCENTAGE` - maksymalny dzienny procent ryzyka
+   - `MAX_POSITIONS` - maksymalna liczba jednoczesnych pozycji
+   - `TRADING_SYMBOLS` - pary walutowe do handlu (usuń te, które mają słabe wyniki)
+
+2. W plikach konfiguracyjnych `config/dev/`:
+   - Parametry filtrów sygnałów
+   - Progi pewności dla pomysłów handlowych
+   - Modyfikacje poziomów stop loss i take profit
+
+3. W promptach LLM:
+   - Dostosuj szablony promptów dla par walutowych, które dają najlepsze wyniki
+   - Zwiększ nacisk na analizę najlepszych godzin handlowych
+
 ## Wyłączanie systemu
 
 Aby wyłączyć system:
 
-1. Zamknij wszystkie uruchomione komponenty (Ctrl+C w terminalu lub zamknij okna)
-2. Usuń Expert Advisor z wykresu w MT5 (kliknij prawym przyciskiem myszy na wykresie i wybierz "Expert Advisors" > "Remove")
-3. W razie potrzeby wykonaj backup bazy danych:
+1. Jeśli używasz skryptu `run_demo_test.py`, naciśnij Ctrl+C, aby zatrzymać test (skrypt automatycznie zatrzyma wszystkie komponenty)
+2. Jeśli uruchamiałeś komponenty ręcznie, zamknij wszystkie uruchomione komponenty (Ctrl+C w terminalu lub zamknij okna)
+3. Usuń Expert Advisor z wykresu w MT5 (kliknij prawym przyciskiem myszy na wykresie i wybierz "Expert Advisors" > "Remove")
+4. W razie potrzeby wykonaj backup bazy danych:
    ```bash
    cp database/dev.db database/dev.db.backup
    ```

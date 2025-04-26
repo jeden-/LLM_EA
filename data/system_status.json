@@ -1,0 +1,9 @@
+{
+    "timestamp": "2025-01-01T00:00:00",
+    "components": {
+        "test_component": {
+            "status": "RUNNING"
+        }
+    },
+    "overall_status": "OK"
+}
