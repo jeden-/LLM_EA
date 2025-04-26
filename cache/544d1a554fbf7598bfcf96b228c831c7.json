@@ -1,0 +1,21 @@
+{
+  "error": "expected string or bytes-like object",
+  "_validation": {
+    "is_valid": false,
+    "timestamp": "2025-04-25T18:48:23.246806",
+    "error": "Błąd podczas walidacji: expected string or bytes-like object"
+  },
+  "_metadata": {
+    "timestamp": "2025-04-25T18:48:23.246806",
+    "execution_time_ms": 0,
+    "provider": "default",
+    "success": false
+  },
+  "metadata": {
+    "timestamp": "2025-04-25T18:48:23.246806",
+    "symbol": "EURUSD",
+    "timeframe": "H1",
+    "model": "grok-3-mini-fast-beta",
+    "generation_time": 0.0
+  }
+}

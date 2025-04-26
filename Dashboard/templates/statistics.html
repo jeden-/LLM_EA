@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block title %}Statystyki - System Handlowy LLM{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4>Statystyki wydajności systemu</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Filtrowanie okresów -->
+                    <div class="col-md-12 mb-4">
+                        <form class="row g-3" method="GET">
+                            <div class="col-auto">
+                                <label for="period" class="col-form-label">Okres:</label>
+                            </div>
+                            <div class="col-auto">
+                                <select class="form-select" id="period" name="period" onchange="this.form.submit()">
+                                    <option value="7" {% if period == 7 %}selected{% endif %}>Ostatnie 7 dni</option>
+                                    <option value="30" {% if period == 30 %}selected{% endif %}>Ostatnie 30 dni</option>
+                                    <option value="90" {% if period == 90 %}selected{% endif %}>Ostatnie 90 dni</option>
+                                    <option value="180" {% if period == 180 %}selected{% endif %}>Ostatnie 6 miesięcy</option>
+                                    <option value="365" {% if period == 365 %}selected{% endif %}>Ostatni rok</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Wyniki ogólne -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card text-center h-100">
+                            <div class="card-header bg-info text-white">
+                                Całkowity zysk/strata
+                            </div>
+                            <div class="card-body">
+                                <h3 class="{% if stats.total_pnl >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                    {{ stats.total_pnl|default(0)|round(2) }} {{ stats.currency|default('USD') }}
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center h-100">
+                            <div class="card-header bg-info text-white">
+                                Win Rate
+                            </div>
+                            <div class="card-body">
+                                <h3>{{ stats.win_rate|default(0) }}%</h3>
+                                <small>{{ stats.winning_trades|default(0) }}/{{ stats.total_trades|default(0) }} transakcji</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center h-100">
+                            <div class="card-header bg-info text-white">
+                                Średni zysk
+                            </div>
+                            <div class="card-body">
+                                <h3 class="text-success">
+                                    {{ stats.avg_win|default(0)|round(2) }} {{ stats.currency|default('USD') }}
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center h-100">
+                            <div class="card-header bg-info text-white">
+                                Średnia strata
+                            </div>
+                            <div class="card-body">
+                                <h3 class="text-danger">
+                                    {{ stats.avg_loss|default(0)|round(2) }} {{ stats.currency|default('USD') }}
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Wykresy -->
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-header bg-secondary text-white">
+                                Wyniki w czasie
+                            </div>
+                            <div class="card-body">
+                                <div id="equity-chart" style="height: 400px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-header bg-secondary text-white">
+                                Wyniki wg instrumentów
+                            </div>
+                            <div class="card-body">
+                                <div id="instruments-chart" style="height: 400px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statystyki zaawansowane -->
+                <div class="row">
+                    <div class="col-md-12 mb-4">
+                        <div class="card">
+                            <div class="card-header bg-warning text-dark">
+                                Szczegółowe statystyki
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Metryka</th>
+                                                <th>Wartość</th>
+                                                <th>Opis</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Profit Factor</td>
+                                                <td>{{ stats.profit_factor|default(0)|round(2) }}</td>
+                                                <td>Stosunek całkowitego zysku do całkowitej straty</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Sharpe Ratio</td>
+                                                <td>{{ stats.sharpe_ratio|default(0)|round(2) }}</td>
+                                                <td>Miara efektywności inwestycji względem ryzyka</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Maximum Drawdown</td>
+                                                <td>{{ stats.max_drawdown|default(0)|round(2) }} {{ stats.currency|default('USD') }}</td>
+                                                <td>Największa strata od szczytu do dołka</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Expectancy</td>
+                                                <td>{{ stats.expectancy|default(0)|round(2) }} {{ stats.currency|default('USD') }}</td>
+                                                <td>Średni oczekiwany wynik na transakcję</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Najdłuższa seria wygranych</td>
+                                                <td>{{ stats.max_win_streak|default(0) }}</td>
+                                                <td>Największa liczba wygranych transakcji z rzędu</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Najdłuższa seria przegranych</td>
+                                                <td>{{ stats.max_loss_streak|default(0) }}</td>
+                                                <td>Największa liczba przegranych transakcji z rzędu</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Średni czas transakcji</td>
+                                                <td>{{ stats.avg_trade_time|default('N/A') }}</td>
+                                                <td>Średni czas utrzymywania pozycji</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Wykres kapitału w czasie
+        if (document.getElementById('equity-chart')) {
+            const equityData = {
+                x: {{ equity_dates|default('[]')|tojson }},
+                y: {{ equity_values|default('[]')|tojson }},
+                type: 'scatter',
+                mode: 'lines',
+                line: {
+                    color: 'rgba(75, 192, 192, 1)',
+                    width: 2
+                },
+                fill: 'tozeroy',
+                fillcolor: 'rgba(75, 192, 192, 0.2)'
+            };
+
+            const equityLayout = {
+                title: 'Zmiana kapitału w czasie',
+                xaxis: {
+                    title: 'Data'
+                },
+                yaxis: {
+                    title: 'Kapitał ({{ stats.currency|default("USD") }})'
+                },
+                margin: {
+                    l: 50,
+                    r: 50,
+                    b: 50,
+                    t: 50,
+                    pad: 4
+                }
+            };
+
+            Plotly.newPlot('equity-chart', [equityData], equityLayout);
+        }
+
+        // Wykres wyników według instrumentów
+        if (document.getElementById('instruments-chart')) {
+            const instrumentsData = {
+                x: {{ instruments|default('[]')|tojson }},
+                y: {{ instrument_pnls|default('[]')|tojson }},
+                type: 'bar',
+                marker: {
+                    color: {{ instrument_pnls|default('[]')|tojson }}.map(val => val >= 0 ? 'rgba(75, 192, 192, 0.8)' : 'rgba(255, 99, 132, 0.8)')
+                }
+            };
+
+            const instrumentsLayout = {
+                title: 'Zysk/strata według instrumentów',
+                xaxis: {
+                    title: 'Instrument'
+                },
+                yaxis: {
+                    title: 'Zysk/strata ({{ stats.currency|default("USD") }})'
+                },
+                margin: {
+                    l: 50,
+                    r: 50,
+                    b: 100,
+                    t: 50,
+                    pad: 4
+                }
+            };
+
+            Plotly.newPlot('instruments-chart', [instrumentsData], instrumentsLayout);
+        }
+    });
+</script>
+{% endblock %} 

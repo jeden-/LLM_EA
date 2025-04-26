@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+
+{% block title %}Dziennik handlowy - System Handlowy LLM{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4>Dziennik handlowy</h4>
+            </div>
+            <div class="card-body">
+                <!-- Filtry wyszukiwania -->
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <form method="GET" class="row g-3">
+                            <div class="col-md-2">
+                                <label for="start_date" class="form-label">Od daty</label>
+                                <input type="date" class="form-control" id="start_date" name="start_date" value="{{ filters.start_date }}">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="end_date" class="form-label">Do daty</label>
+                                <input type="date" class="form-control" id="end_date" name="end_date" value="{{ filters.end_date }}">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="symbol" class="form-label">Instrument</label>
+                                <select class="form-select" id="symbol" name="symbol">
+                                    <option value="">Wszystkie</option>
+                                    {% for s in symbols %}
+                                    <option value="{{ s }}" {% if filters.symbol == s %}selected{% endif %}>{{ s }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="result" class="form-label">Wynik</label>
+                                <select class="form-select" id="result" name="result">
+                                    <option value="">Wszystkie</option>
+                                    <option value="win" {% if filters.result == 'win' %}selected{% endif %}>Zysk</option>
+                                    <option value="loss" {% if filters.result == 'loss' %}selected{% endif %}>Strata</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="trade_type" class="form-label">Typ transakcji</label>
+                                <select class="form-select" id="trade_type" name="trade_type">
+                                    <option value="">Wszystkie</option>
+                                    <option value="BUY" {% if filters.trade_type == 'BUY' %}selected{% endif %}>Kupno</option>
+                                    <option value="SELL" {% if filters.trade_type == 'SELL' %}selected{% endif %}>Sprzedaż</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">Filtruj</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Tabela transakcji -->
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Data otwarcia</th>
+                                <th>Data zamknięcia</th>
+                                <th>Instrument</th>
+                                <th>Kierunek</th>
+                                <th>Rozmiar</th>
+                                <th>Cena wejścia</th>
+                                <th>Cena wyjścia</th>
+                                <th>Stop Loss</th>
+                                <th>Take Profit</th>
+                                <th>Profit/Loss</th>
+                                <th>Czas trwania</th>
+                                <th>Szczegóły</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if trades %}
+                                {% for trade in trades %}
+                                <tr class="{% if trade.pnl > 0 %}table-success{% elif trade.pnl < 0 %}table-danger{% endif %}">
+                                    <td>{{ trade.id }}</td>
+                                    <td>{{ trade.open_time|default('-') }}</td>
+                                    <td>{{ trade.close_time|default('-') }}</td>
+                                    <td>{{ trade.symbol }}</td>
+                                    <td>{{ 'Kupno' if trade.type == 'BUY' else 'Sprzedaż' }}</td>
+                                    <td>{{ trade.volume }}</td>
+                                    <td>{{ trade.open_price|round(5) }}</td>
+                                    <td>{{ trade.close_price|default('-')|round(5) }}</td>
+                                    <td>{{ trade.sl|default('-')|round(5) }}</td>
+                                    <td>{{ trade.tp|default('-')|round(5) }}</td>
+                                    <td class="{% if trade.pnl > 0 %}text-success{% elif trade.pnl < 0 %}text-danger{% else %}text-secondary{% endif %}">
+                                        {{ trade.pnl|default(0)|round(2) }} {{ trade.currency|default('USD') }}
+                                    </td>
+                                    <td>{{ trade.duration|default('-') }}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-info" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#tradeModal{{ trade.id }}">
+                                            Szczegóły
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="13" class="text-center">Brak transakcji spełniających kryteria filtrowania</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Paginacja -->
+                {% if pagination %}
+                <div class="d-flex justify-content-center mt-4">
+                    <nav aria-label="Nawigacja po stronach">
+                        <ul class="pagination">
+                            <li class="page-item {% if pagination.current_page == 1 %}disabled{% endif %}">
+                                <a class="page-link" href="{{ pagination.prev_url }}" aria-label="Poprzednia">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            
+                            {% for page in pagination.pages %}
+                                {% if page == pagination.current_page %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ page }}</span>
+                                </li>
+                                {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ pagination.base_url }}?page={{ page }}&{{ pagination.query_params }}">{{ page }}</a>
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            <li class="page-item {% if pagination.current_page == pagination.total_pages %}disabled{% endif %}">
+                                <a class="page-link" href="{{ pagination.next_url }}" aria-label="Następna">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modalne okna dla szczegółów transakcji -->
+{% if trades %}
+    {% for trade in trades %}
+    <div class="modal fade" id="tradeModal{{ trade.id }}" tabindex="-1" aria-labelledby="tradeModalLabel{{ trade.id }}" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tradeModalLabel{{ trade.id }}">Szczegóły transakcji #{{ trade.id }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zamknij"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Podstawowe informacje</h6>
+                            <table class="table table-sm">
+                                <tr>
+                                    <th>Instrument:</th>
+                                    <td>{{ trade.symbol }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Kierunek:</th>
+                                    <td>{{ 'Kupno' if trade.type == 'BUY' else 'Sprzedaż' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Wielkość:</th>
+                                    <td>{{ trade.volume }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Data otwarcia:</th>
+                                    <td>{{ trade.open_time|default('-') }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Data zamknięcia:</th>
+                                    <td>{{ trade.close_time|default('-') }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Cena wejścia:</th>
+                                    <td>{{ trade.open_price|round(5) }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Cena wyjścia:</th>
+                                    <td>{{ trade.close_price|default('-')|round(5) }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Stop Loss:</th>
+                                    <td>{{ trade.sl|default('-')|round(5) }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Take Profit:</th>
+                                    <td>{{ trade.tp|default('-')|round(5) }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Profit/Loss:</th>
+                                    <td class="{% if trade.pnl > 0 %}text-success{% elif trade.pnl < 0 %}text-danger{% else %}text-secondary{% endif %}">
+                                        {{ trade.pnl|default(0)|round(2) }} {{ trade.currency|default('USD') }}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Dodatkowe informacje</h6>
+                            <table class="table table-sm">
+                                <tr>
+                                    <th>Risk-Reward Ratio:</th>
+                                    <td>{{ trade.risk_reward_ratio|default('-') }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Ryzyko (%):</th>
+                                    <td>{{ trade.risk_percent|default('-') }}%</td>
+                                </tr>
+                                <tr>
+                                    <th>Źródło sygnału:</th>
+                                    <td>{{ trade.signal_source|default('-') }}</td>
+                                </tr>
+                                <tr>
+                                    <th>ID pomysłu handlowego:</th>
+                                    <td>{{ trade.trade_idea_id|default('-') }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Typ zamknięcia:</th>
+                                    <td>{{ trade.close_reason|default('-') }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Analiza rynku:</th>
+                                    <td>{{ trade.market_analysis|default('-') }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    {% if trade.notes %}
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h6>Notatki:</h6>
+                            <div class="p-3 bg-light">
+                                {{ trade.notes|safe }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if trade.screenshots %}
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h6>Zrzuty ekranu:</h6>
+                            <div class="d-flex flex-wrap">
+                                {% for screenshot in trade.screenshots %}
+                                <div class="m-2">
+                                    <a href="{{ screenshot }}" target="_blank">
+                                        <img src="{{ screenshot }}" alt="Screenshot {{ loop.index }}" class="img-thumbnail" style="max-width: 200px;">
+                                    </a>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% endif %}
+{% endblock %} 

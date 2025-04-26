@@ -1,0 +1,124 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Metoda Vibe Coding - Tworzenie Aplikacji z AI
+
+## Wprowadzenie
+
+Vibe Coding to metoda tworzenia aplikacji przy minimalnym bezpośrednim pisaniu kodu, wykorzystująca modele AI do wsparcia w całym procesie rozwoju oprogramowania. Poniżej przedstawiono pełen proces od koncepcji do wdrożenia.
+
+## Schemat procesu
+
+```
+Pomysł → Specyfikacja → PRD → Stos technologiczny → Plan implementacji
+   ↓
+Plik progress_tracking → Inicjalizacja → Weryfikacja → Commity → Praca w pętli → Wdrożenie
+```
+
+## Etapy procesu
+
+### 1. Zdefiniowanie problemu i pomysłu na aplikację
+
+- Zidentyfikuj konkretny problem, który aplikacja ma rozwiązać
+- Określ ogólne wymagania i założenia
+- Określ podstawowy zakres i typ aplikacji (webowa, mobilna, desktop)
+
+### 2. Opracowanie szczegółowej specyfikacji
+
+- Wykorzystaj chatbota AI do utworzenia szczegółowej listy funkcjonalności
+- Określ, co konkretnie ma robić aplikacja
+- Zdefiniuj widoki, funkcje i scenariusze użycia
+- Zgłaszaj uwagi i iteruj, aż osiągniesz pożądany kształt
+- **Uwaga:** Ten etap wymaga największego zaangażowania, ponieważ stanowi fundament dalszej pracy
+
+### 3. Stworzenie dokumentu wymagań (PRD - Product Requirements Document)
+
+- Na podstawie wypracowanej specyfikacji poproś chatbota o stworzenie formalnego PRD w formacie Markdown
+- Upewnij się, że dokument jest w 100% zgodny z wcześniej ustalonymi wymaganiami
+- Zapisz PRD do pliku do wykorzystania w kolejnych krokach
+
+### 4. Wybór stosu technologicznego
+
+- Wykorzystaj najnowszy model AI z dobrymi zdolnościami programistycznymi (np. Gemini 2.5 Pro, Claude 3.7 Sonnet)
+- Poproś model o specyfikację najbardziej odpowiedniego stosu technologicznego na podstawie PRD
+- Dostosuj ewentualnie propozycje do własnych preferencji, pamiętając że modele lepiej radzą sobie z popularnymi technologiami
+- Zapisz specyfikację technologiczną do pliku (np. techstack.md)
+
+### 5. Stworzenie szczegółowego planu implementacji
+
+- Na podstawie PRD i specyfikacji technicznej stwórz szczegółowy plan implementacji w formacie Markdown
+- Zwróć szczególną uwagę na granularność zadań - każdy krok powinien być:
+  - Możliwie drobny
+  - Testowalny po ukończeniu
+- Podziel plan na fazy i ponumerowane punkty
+
+### 6. Przygotowanie śledzenia postępów
+
+- Utwórz pusty plik (np. progress_tracking.md)
+- W tym pliku model będzie zapisywał postępy prac
+- Pomoże to utrzymać ciągłość pracy nawet po utracie kontekstu rozmowy
+
+### 7. Inicjalizacja projektu przez agenta AI
+
+- Przygotuj krótkiego prompta dla agenta AI z prośbą o:
+  - Zapoznanie się z dokumentami
+  - Rozpoczęcie pracy od punktu 1 fazy 0 planu implementacji
+  - Stworzenie testów
+  - Zapisanie postępu w pliku śledzenia
+- Dołącz do kontekstu wszystkie wcześniej utworzone dokumenty
+- Model powinien wykonać:
+  - Inicjalizację repozytorium Git
+  - Utworzenie środowiska wirtualnego
+  - Instalację frameworków i bibliotek
+  - Stworzenie struktury i plików projektu
+  - Konfigurację bazy danych
+  - Przygotowanie dokumentacji
+  - Konfigurację Dockera i testów
+
+### 8. Weryfikacja i poprawianie błędów
+
+- Śledź postępy pracy agenta i reaguj na bieżąco na problemy
+- Sprawdzaj, czy wszystko działa zgodnie z założeniami
+- Zgłaszaj problemy do agenta, aż wszystkie zostaną rozwiązane
+
+### 9. Zapisywanie postępów w repozytorium
+
+- Po zakończeniu każdego etapu pracy zapisuj zmiany w repozytorium Git
+- Pozwoli to na powrót do działającego stanu w przypadku problemów z kolejnymi etapami
+- Dbaj o regularne commity, aby zawsze posuwać się do przodu
+
+### 10. Praca w pętli
+
+Kontynuuj pracę w schemacie:
+1. Prompt dla agenta z prośbą o wykonanie kolejnego punktu z planu
+2. Weryfikacja wykonanej pracy
+3. Poprawki (jeśli potrzebne)
+4. Commit zmian
+5. Przejście do następnego punktu planu
+
+### 11. Dodatkowe etapy
+
+Co jakiś czas, zwłaszcza po zakończeniu większych sekcji planu, wykonuj:
+- Refactoring kodu
+- Audyt bezpieczeństwa
+
+### 12. Wdrożenie aplikacji
+
+- Skorzystaj z dokumentacji wygenerowanej przez agenta
+- Użyj chatbota do pomocy w procesie wdrożenia
+
+## Wskazówki
+
+- Korzystaj z odpowiednich modeli AI dla różnych zadań:
+  - Modele z najświeższą wiedzą do wyboru technologii
+  - Modele z dobrymi zdolnościami programistycznymi do kodowania
+- Planuj z wyprzedzeniem i dbaj o szczegółowość dokumentacji
+- Śledź postępy i regularnie zapisuj zmiany
+- Nie pozwalaj na zbyt duże zmiany bez weryfikacji
+- Testuj każdy ukończony etap przed przejściem dalej
+- Wykorzystuj mocne strony różnych modeli AI - niektóre lepiej planują, inne lepiej piszą kod
+- Zadbaj o bezpieczeństwo - nie umieszczaj wrażliwych danych w promptach
+
+Ta metodologia pozwala na tworzenie złożonych aplikacji z minimalnym bezpośrednim pisaniem kodu, oszczędzając czas i wysiłek, jednocześnie zachowując kontrolę nad procesem rozwoju. 

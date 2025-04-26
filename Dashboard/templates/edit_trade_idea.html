@@ -1,0 +1,404 @@
+{% extends "base.html" %}
+
+{% block title %}Edycja pomysłu handlowego - System Handlowy LLM{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard.trade_ideas') }}">Pomysły handlowe</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard.trade_idea_details', idea_id=trade_idea.id) }}">Pomysł #{{ trade_idea.id }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Edycja</li>
+                </ol>
+            </nav>
+            <h2 class="mb-4">Edycja pomysłu handlowego #{{ trade_idea.id }}</h2>
+        </div>
+    </div>
+
+    {% if error %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Błąd!</strong> {{ error }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+    {% if trade_idea.status != 'PENDING' %}
+    <div class="alert alert-warning mb-4">
+        <i class="fas fa-exclamation-triangle me-2"></i> Uwaga: Ten pomysł handlowy ma status <strong>{{ trade_idea.status }}</strong>. Edycja może mieć ograniczone efekty.
+    </div>
+    {% endif %}
+    
+    <form method="post" action="{{ url_for('dashboard.edit_trade_idea', idea_id=trade_idea.id) }}" enctype="multipart/form-data" class="needs-validation" novalidate>
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Dane podstawowe</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="symbol" class="form-label">Instrument *</label>
+                            <input type="text" class="form-control" id="symbol" name="symbol" required value="{{ trade_idea.symbol }}">
+                            <div class="form-text">Wprowadź symbol instrumentu (np. EURUSD, GOLD, BTCUSD).</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Kierunek transakcji *</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="direction" id="direction_buy" value="BUY" required {% if trade_idea.direction == 'BUY' %}checked{% endif %}>
+                                <label class="form-check-label text-success" for="direction_buy">
+                                    <i class="fas fa-arrow-up me-1"></i> Kupno (Long)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="direction" id="direction_sell" value="SELL" required {% if trade_idea.direction == 'SELL' %}checked{% endif %}>
+                                <label class="form-check-label text-danger" for="direction_sell">
+                                    <i class="fas fa-arrow-down me-1"></i> Sprzedaż (Short)
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="entry_price" class="form-label">Cena wejścia *</label>
+                            <input type="number" step="0.00001" class="form-control" id="entry_price" name="entry_price" required value="{{ trade_idea.entry_price }}">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="stop_loss" class="form-label">Stop Loss *</label>
+                            <input type="number" step="0.00001" class="form-control" id="stop_loss" name="stop_loss" required value="{{ trade_idea.stop_loss }}">
+                            <div class="form-text" id="stop_loss_hint"></div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="take_profit" class="form-label">Take Profit *</label>
+                            <input type="number" step="0.00001" class="form-control" id="take_profit" name="take_profit" required value="{{ trade_idea.take_profit }}">
+                            <div class="form-text" id="take_profit_hint"></div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="valid_until" class="form-label">Ważny do *</label>
+                            <input type="datetime-local" class="form-control" id="valid_until" name="valid_until" required value="{{ trade_idea.valid_until.strftime('%Y-%m-%dT%H:%M') }}">
+                            <div class="form-text">Do kiedy pomysł handlowy będzie aktualny.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="timeframe" class="form-label">Ramy czasowe *</label>
+                            <select class="form-select" id="timeframe" name="timeframe" required>
+                                <option value="">Wybierz ramy czasowe...</option>
+                                <option value="M1" {% if trade_idea.timeframe == 'M1' %}selected{% endif %}>M1</option>
+                                <option value="M5" {% if trade_idea.timeframe == 'M5' %}selected{% endif %}>M5</option>
+                                <option value="M15" {% if trade_idea.timeframe == 'M15' %}selected{% endif %}>M15</option>
+                                <option value="M30" {% if trade_idea.timeframe == 'M30' %}selected{% endif %}>M30</option>
+                                <option value="H1" {% if trade_idea.timeframe == 'H1' %}selected{% endif %}>H1</option>
+                                <option value="H4" {% if trade_idea.timeframe == 'H4' %}selected{% endif %}>H4</option>
+                                <option value="D1" {% if trade_idea.timeframe == 'D1' %}selected{% endif %}>D1</option>
+                                <option value="W1" {% if trade_idea.timeframe == 'W1' %}selected{% endif %}>W1</option>
+                                <option value="MN" {% if trade_idea.timeframe == 'MN' %}selected{% endif %}>MN</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="strategy" class="form-label">Strategia *</label>
+                            <select class="form-select" id="strategy" name="strategy" required>
+                                <option value="">Wybierz strategię...</option>
+                                <option value="Trend Following" {% if trade_idea.strategy == 'Trend Following' %}selected{% endif %}>Trend Following</option>
+                                <option value="Breakout" {% if trade_idea.strategy == 'Breakout' %}selected{% endif %}>Breakout</option>
+                                <option value="Support/Resistance" {% if trade_idea.strategy == 'Support/Resistance' %}selected{% endif %}>Support/Resistance</option>
+                                <option value="Price Action" {% if trade_idea.strategy == 'Price Action' %}selected{% endif %}>Price Action</option>
+                                <option value="Fibonacci" {% if trade_idea.strategy == 'Fibonacci' %}selected{% endif %}>Fibonacci</option>
+                                <option value="Harmonic Patterns" {% if trade_idea.strategy == 'Harmonic Patterns' %}selected{% endif %}>Harmonic Patterns</option>
+                                <option value="Swing Trading" {% if trade_idea.strategy == 'Swing Trading' %}selected{% endif %}>Swing Trading</option>
+                                <option value="Scalping" {% if trade_idea.strategy == 'Scalping' %}selected{% endif %}>Scalping</option>
+                                <option value="Day Trading" {% if trade_idea.strategy == 'Day Trading' %}selected{% endif %}>Day Trading</option>
+                                <option value="Position Trading" {% if trade_idea.strategy == 'Position Trading' %}selected{% endif %}>Position Trading</option>
+                                <option value="Inne" {% if trade_idea.strategy == 'Inne' %}selected{% endif %}>Inne</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="risk_percentage" class="form-label">Ryzyko (% kapitału)</label>
+                            <input type="number" step="0.1" min="0.1" max="5" class="form-control" id="risk_percentage" name="risk_percentage" value="{{ trade_idea.risk_percentage }}">
+                            <div class="form-text">Procentowe ryzyko kapitału na tę transakcję (domyślnie 1%).</div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="source" class="form-label">Źródło pomysłu *</label>
+                            <select class="form-select" id="source" name="source" required>
+                                <option value="">Wybierz źródło...</option>
+                                <option value="Własna analiza" {% if trade_idea.source == 'Własna analiza' %}selected{% endif %}>Własna analiza</option>
+                                <option value="LLM Expert Advisor" {% if trade_idea.source == 'LLM Expert Advisor' %}selected{% endif %}>LLM Expert Advisor</option>
+                                <option value="Sygnał zewnętrzny" {% if trade_idea.source == 'Sygnał zewnętrzny' %}selected{% endif %}>Sygnał zewnętrzny</option>
+                                <option value="Inne" {% if trade_idea.source == 'Inne' %}selected{% endif %}>Inne</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Analiza i uzasadnienie</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="technical_analysis" class="form-label">Analiza techniczna *</label>
+                    <textarea class="form-control" id="technical_analysis" name="technical_analysis" rows="5" required>{{ trade_idea.technical_analysis }}</textarea>
+                    <div class="form-text">Opisz uzasadnienie techniczne tego pomysłu handlowego.</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="fundamental_analysis" class="form-label">Analiza fundamentalna</label>
+                    <textarea class="form-control" id="fundamental_analysis" name="fundamental_analysis" rows="3">{{ trade_idea.fundamental_analysis }}</textarea>
+                    <div class="form-text">Opisz uzasadnienie fundamentalne (jeśli dotyczy).</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="risk_analysis" class="form-label">Analiza ryzyka</label>
+                    <textarea class="form-control" id="risk_analysis" name="risk_analysis" rows="3">{{ trade_idea.risk_analysis }}</textarea>
+                    <div class="form-text">Opisz analizę ryzyka dla tego pomysłu handlowego.</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="chart_image" class="form-label">Wykres</label>
+                    <div class="d-flex align-items-center mb-2">
+                        {% if trade_idea.chart_image %}
+                        <div class="me-3">
+                            <img src="{{ url_for('dashboard.static', filename='charts/' + trade_idea.chart_image) }}" 
+                                 class="img-thumbnail" style="max-height: 100px;">
+                        </div>
+                        <div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="delete_chart" id="delete_chart">
+                                <label class="form-check-label text-danger" for="delete_chart">
+                                    Usuń istniejący wykres
+                                </label>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="text-muted">Brak wykresu</div>
+                        {% endif %}
+                    </div>
+                    <input class="form-control" type="file" id="chart_image" name="chart_image" accept="image/*">
+                    <div class="form-text">Dodaj nowy zrzut ekranu z analizą techniczną.</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="notes" class="form-label">Dodatkowe notatki</label>
+                    <textarea class="form-control" id="notes" name="notes" rows="3">{{ trade_idea.notes }}</textarea>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Podsumowanie</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Risk-Reward Ratio</label>
+                            <div id="risk_reward_display" class="p-2 border rounded bg-light">
+                                Przeliczanie...
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Kwota ryzyka</label>
+                            <div id="risk_amount_display" class="p-2 border rounded bg-light">
+                                Przeliczanie...
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Potencjalny zysk</label>
+                            <div id="potential_profit_display" class="p-2 border rounded bg-light">
+                                Przeliczanie...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Data utworzenia</label>
+                            <div class="p-2 border rounded bg-light">
+                                {{ trade_idea.created_at.strftime('%d-%m-%Y %H:%M:%S') }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Aktualny status</label>
+                            <div class="p-2 border rounded {% if trade_idea.status == 'PENDING' %}bg-warning{% elif trade_idea.status == 'EXECUTED' %}bg-success{% elif trade_idea.status == 'EXPIRED' %}bg-secondary{% elif trade_idea.status == 'REJECTED' %}bg-danger{% else %}bg-light{% endif %} text-white">
+                                <strong>
+                                    {% if trade_idea.status == 'PENDING' %}
+                                    Oczekujący
+                                    {% elif trade_idea.status == 'EXECUTED' %}
+                                    Wykonany
+                                    {% elif trade_idea.status == 'EXPIRED' %}
+                                    Wygasły
+                                    {% elif trade_idea.status == 'REJECTED' %}
+                                    Odrzucony
+                                    {% else %}
+                                    {{ trade_idea.status }}
+                                    {% endif %}
+                                </strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="d-flex justify-content-between mb-5">
+            <a href="{{ url_for('dashboard.trade_idea_details', idea_id=trade_idea.id) }}" class="btn btn-secondary">Anuluj</a>
+            <div>
+                <button type="submit" class="btn btn-primary" name="action" value="save">Zapisz zmiany</button>
+                {% if trade_idea.status == 'PENDING' %}
+                <button type="submit" class="btn btn-success ms-2" name="action" value="execute">Zapisz i wykonaj</button>
+                {% endif %}
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Elementy formularza
+    const entryPriceInput = document.getElementById('entry_price');
+    const stopLossInput = document.getElementById('stop_loss');
+    const takeProfitInput = document.getElementById('take_profit');
+    const directionBuyInput = document.getElementById('direction_buy');
+    const directionSellInput = document.getElementById('direction_sell');
+    const riskPercentageInput = document.getElementById('risk_percentage');
+    
+    // Elementy wyświetlające
+    const riskRewardDisplay = document.getElementById('risk_reward_display');
+    const riskAmountDisplay = document.getElementById('risk_amount_display');
+    const potentialProfitDisplay = document.getElementById('potential_profit_display');
+    const stopLossHint = document.getElementById('stop_loss_hint');
+    const takeProfitHint = document.getElementById('take_profit_hint');
+    
+    // Funkcja do przeliczania wartości
+    function calculateValues() {
+        const entryPrice = parseFloat(entryPriceInput.value) || 0;
+        const stopLoss = parseFloat(stopLossInput.value) || 0;
+        const takeProfit = parseFloat(takeProfitInput.value) || 0;
+        const riskPercentage = parseFloat(riskPercentageInput.value) || 1;
+        const isBuy = directionBuyInput.checked;
+        
+        // Sprawdź, czy dane są dostępne
+        if (entryPrice && stopLoss && takeProfit) {
+            // Oblicz różnice cenowe
+            let priceDifferenceToSL = Math.abs(entryPrice - stopLoss);
+            let priceDifferenceToTP = Math.abs(entryPrice - takeProfit);
+            
+            // Sprawdź poprawność kierunku
+            let isValid = true;
+            if (isBuy) {
+                if (stopLoss >= entryPrice) {
+                    stopLossHint.innerHTML = '<span class="text-danger">Stop Loss powinien być poniżej ceny wejścia dla pozycji kupna</span>';
+                    isValid = false;
+                } else {
+                    stopLossHint.innerHTML = '<span class="text-success">Stop Loss prawidłowy dla pozycji kupna</span>';
+                }
+                
+                if (takeProfit <= entryPrice) {
+                    takeProfitHint.innerHTML = '<span class="text-danger">Take Profit powinien być powyżej ceny wejścia dla pozycji kupna</span>';
+                    isValid = false;
+                } else {
+                    takeProfitHint.innerHTML = '<span class="text-success">Take Profit prawidłowy dla pozycji kupna</span>';
+                }
+            } else { // Dla pozycji SELL
+                if (stopLoss <= entryPrice) {
+                    stopLossHint.innerHTML = '<span class="text-danger">Stop Loss powinien być powyżej ceny wejścia dla pozycji sprzedaży</span>';
+                    isValid = false;
+                } else {
+                    stopLossHint.innerHTML = '<span class="text-success">Stop Loss prawidłowy dla pozycji sprzedaży</span>';
+                }
+                
+                if (takeProfit >= entryPrice) {
+                    takeProfitHint.innerHTML = '<span class="text-danger">Take Profit powinien być poniżej ceny wejścia dla pozycji sprzedaży</span>';
+                    isValid = false;
+                } else {
+                    takeProfitHint.innerHTML = '<span class="text-success">Take Profit prawidłowy dla pozycji sprzedaży</span>';
+                }
+            }
+            
+            if (isValid) {
+                // Oblicz Risk-Reward Ratio
+                const riskRewardRatio = priceDifferenceToTP / priceDifferenceToSL;
+                riskRewardDisplay.innerHTML = `<strong>1:${riskRewardRatio.toFixed(2)}</strong>`;
+                
+                // Przykładowe wartości - tutaj należałoby pobrać kapitał z konta
+                const accountBalance = 10000; // Przykładowy kapitał
+                const riskAmount = accountBalance * (riskPercentage / 100);
+                riskAmountDisplay.innerHTML = `<strong>${riskAmount.toFixed(2)} USD</strong>`;
+                
+                const potentialProfit = riskAmount * riskRewardRatio;
+                potentialProfitDisplay.innerHTML = `<strong>${potentialProfit.toFixed(2)} USD</strong>`;
+            } else {
+                riskRewardDisplay.innerHTML = `<span class="text-danger">Nieprawidłowe ustawienia</span>`;
+                riskAmountDisplay.innerHTML = `<span class="text-danger">Nieprawidłowe ustawienia</span>`;
+                potentialProfitDisplay.innerHTML = `<span class="text-danger">Nieprawidłowe ustawienia</span>`;
+            }
+        } else {
+            riskRewardDisplay.innerHTML = `Wprowadź cenę wejścia, SL i TP`;
+            riskAmountDisplay.innerHTML = `Wprowadź SL i % ryzyka`;
+            potentialProfitDisplay.innerHTML = `Wprowadź TP i % ryzyka`;
+        }
+    }
+    
+    // Dodaj nasłuchiwanie zmian
+    entryPriceInput.addEventListener('input', calculateValues);
+    stopLossInput.addEventListener('input', calculateValues);
+    takeProfitInput.addEventListener('input', calculateValues);
+    directionBuyInput.addEventListener('change', calculateValues);
+    directionSellInput.addEventListener('change', calculateValues);
+    riskPercentageInput.addEventListener('input', calculateValues);
+    
+    // Walidacja formularza
+    (function() {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms).forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
+    
+    // Inicjalizacja obliczeń
+    calculateValues();
+});
+</script>
+{% endblock %} 

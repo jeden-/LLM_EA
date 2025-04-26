@@ -1,0 +1,41 @@
+{
+  "analysis": {
+    "trend": "bullish",
+    "strength": 7,
+    "volatility": "średnia",
+    "momentum": "rosnący"
+  },
+  "key_levels": {
+    "support": [
+      1.078,
+      1.075
+    ],
+    "resistance": [
+      1.085,
+      1.088
+    ]
+  },
+  "recommendation": {
+    "action": "Wait for bullish setup",
+    "setup": "Pullback to support"
+  },
+  "explanation": "Rynek wykazuje silny trend wzrostowy.",
+  "_validation": {
+    "is_valid": true,
+    "timestamp": "2025-04-25T18:20:17.104879",
+    "was_fixed": false
+  },
+  "_metadata": {
+    "timestamp": "2025-04-25T18:20:17.104879",
+    "execution_time_ms": 0,
+    "provider": "default",
+    "success": true
+  },
+  "metadata": {
+    "timestamp": "2025-04-25T18:20:17.104879",
+    "symbol": "EURUSD",
+    "timeframe": "H1",
+    "model": "grok-3-mini-fast-beta",
+    "generation_time": 0.0
+  }
+}

@@ -1,0 +1,64 @@
+{
+    "components": {
+        "database": {
+            "script": "Database/run_database.py",
+            "required": true,
+            "restart_attempts": 3,
+            "restart_cooldown": 30
+        },
+        "llm_engine": {
+            "script": "LLM_Engine/run_llm_engine.py",
+            "required": true,
+            "restart_attempts": 3,
+            "restart_cooldown": 60
+        },
+        "mt5_connector": {
+            "script": "MT5_Connector/run_mt5_connector.py",
+            "required": true,
+            "restart_attempts": 3,
+            "restart_cooldown": 30
+        },
+        "agent_manager": {
+            "script": "Agent_Manager/run_agent_manager.py",
+            "required": true,
+            "restart_attempts": 3,
+            "restart_cooldown": 30
+        },
+        "dashboard": {
+            "script": "Dashboard/run_dashboard.py",
+            "required": false,
+            "restart_attempts": 2,
+            "restart_cooldown": 60
+        }
+    },
+    "email": {
+        "enabled": false,
+        "smtp_server": "smtp.example.com",
+        "smtp_port": 587,
+        "username": "",
+        "password": "",
+        "from_email": "system@example.com",
+        "to_email": "admin@example.com",
+        "use_tls": true
+    },
+    "db_monitoring": {
+        "check_interval": 7200,
+        "auto_fix": false,
+        "notify_on_issues": true,
+        "critical_tables": ["trades", "trade_ideas", "market_analysis"],
+        "max_row_limits": {
+            "logs": 10000,
+            "market_analysis": 5000,
+            "statistics": 1000
+        }
+    },
+    "monitoring": {
+        "check_interval": 60,
+        "log_retention_days": 7,
+        "performance_logging": true,
+        "resource_limits": {
+            "cpu_percent_warning": 80,
+            "memory_mb_warning": 500
+        }
+    }
+} 

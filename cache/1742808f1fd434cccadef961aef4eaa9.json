@@ -1,0 +1,28 @@
+{
+  "trend": "bullish",
+  "strength": 7,
+  "key_levels": {
+    "support": [
+      1.078,
+      1.075
+    ],
+    "resistance": [
+      1.085,
+      1.088
+    ]
+  },
+  "recommendation": "buy",
+  "explanation": "Rynek wykazuje silny trend wzrostowy.",
+  "_validation": {
+    "is_valid": true,
+    "timestamp": "2025-04-25T18:08:49.406706",
+    "was_fixed": false
+  },
+  "metadata": {
+    "timestamp": "2025-04-25T18:08:56.431349",
+    "symbol": "EURUSD",
+    "timeframe": "H1",
+    "model": "grok-3-mini-fast-beta",
+    "generation_time": 7.0246429443359375
+  }
+}

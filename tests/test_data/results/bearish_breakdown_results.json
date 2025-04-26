@@ -1,0 +1,33 @@
+{
+  "market_analysis": {
+    "error": "Wszystkie pr\u00f3by generowania odpowiedzi nie powiod\u0142y si\u0119: HTTPConnectionPool(host='localhost', port=11434): Read timed out. (read timeout=60)",
+    "_metadata": {
+      "timestamp": "2025-04-25T15:43:35.876553",
+      "model": "llama3.1:8b",
+      "symbol": "EURUSD",
+      "timeframe": "H1"
+    }
+  },
+  "trade_idea": {
+    "error": "Wszystkie pr\u00f3by generowania odpowiedzi nie powiod\u0142y si\u0119: HTTPConnectionPool(host='localhost', port=11434): Read timed out. (read timeout=60)",
+    "_metadata": {
+      "timestamp": "2025-04-25T15:44:38.025447",
+      "model": "llama3.1:8b",
+      "symbol": "EURUSD",
+      "timeframe": "H1"
+    }
+  },
+  "expected": {
+    "trend": "bearish",
+    "setup": "VWAP Bouncer",
+    "action": "ENTER",
+    "direction": "SELL"
+  },
+  "evaluation": {
+    "success": true,
+    "score": 0.0,
+    "raw_score": 0.0,
+    "max_score": 4.0,
+    "duration": 197.37231349945068
+  }
+}

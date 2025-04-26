@@ -1,0 +1,10 @@
+{
+  "model_name": "grok-3-mini-fast-beta",
+  "model_type": "grok",
+  "xai_api_key": "test_key",
+  "xai_base_url": "https://api.x.ai/v1",
+  "timeout": 60,
+  "max_retries": 1,
+  "cache_dir": "C:\\Users\\win\\Documents\\LLM_EA\\tests\\test_data\\cache",
+  "enable_caching": true
+}

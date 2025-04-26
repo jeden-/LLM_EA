@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Strona główna - System Handlowy LLM{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4>Dashboard Systemu Handlowego LLM</h4>
+            </div>
+            <div class="card-body">
+                <p class="lead">Witaj w systemie handlu algorytmicznego opartym na sztucznej inteligencji.</p>
+                <p>Status systemu: <span class="badge bg-success">Aktywny</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-info text-white">
+                <h5>Podsumowanie Wyników</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="d-flex flex-column align-items-center">
+                            <h6>Zysk/Strata</h6>
+                            <h3 id="pnl" class="{% if account_summary.pnl >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                {{ account_summary.pnl|default(0)|round(2) }} {{ account_summary.currency|default('USD') }}
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex flex-column align-items-center">
+                            <h6>Saldo</h6>
+                            <h3 id="balance">{{ account_summary.balance|default(10000)|round(2) }} {{ account_summary.currency|default('USD') }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row mt-3">
+                    <div class="col-6">
+                        <div class="d-flex flex-column align-items-center">
+                            <h6>Transakcje ogółem</h6>
+                            <h4 id="total-trades">{{ account_summary.total_trades|default(0) }}</h4>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex flex-column align-items-center">
+                            <h6>Win Rate</h6>
+                            <h4 id="win-rate">{{ account_summary.win_rate|default(0) }}%</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-warning text-dark">
+                <h5>Aktywne Transakcje</h5>
+            </div>
+            <div class="card-body">
+                {% if active_trades %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Typ</th>
+                                <th>Otwarcie</th>
+                                <th>Zysk/Strata</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for trade in active_trades %}
+                            <tr>
+                                <td>{{ trade.symbol }}</td>
+                                <td>{{ trade.type }}</td>
+                                <td>{{ trade.open_price }}</td>
+                                <td class="{% if trade.pnl >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                    {{ trade.pnl|round(2) }} {{ account_summary.currency|default('USD') }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-center">Brak aktywnych transakcji</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5>Ostatnie pomysły handlowe</h5>
+            </div>
+            <div class="card-body">
+                {% if trade_ideas %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Symbol</th>
+                                <th>Kierunek</th>
+                                <th>Wejście</th>
+                                <th>Stop Loss</th>
+                                <th>Take Profit</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for idea in trade_ideas %}
+                            <tr>
+                                <td>{{ idea.timestamp }}</td>
+                                <td>{{ idea.symbol }}</td>
+                                <td>{{ idea.direction }}</td>
+                                <td>{{ idea.entry_price }}</td>
+                                <td>{{ idea.stop_loss }}</td>
+                                <td>{{ idea.take_profit }}</td>
+                                <td>
+                                    {% if idea.status == 'pending' %}
+                                    <span class="badge bg-warning">Oczekujący</span>
+                                    {% elif idea.status == 'executed' %}
+                                    <span class="badge bg-success">Wykonany</span>
+                                    {% elif idea.status == 'rejected' %}
+                                    <span class="badge bg-danger">Odrzucony</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">{{ idea.status }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-center">Brak pomysłów handlowych</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Automatyczne odświeżanie danych co 30 sekund
+    setInterval(function() {
+        fetch('/api/account_summary')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('pnl').textContent = `${data.pnl.toFixed(2)} ${data.currency}`;
+                document.getElementById('pnl').className = data.pnl >= 0 ? 'text-success' : 'text-danger';
+                document.getElementById('balance').textContent = `${data.balance.toFixed(2)} ${data.currency}`;
+                document.getElementById('total-trades').textContent = data.total_trades;
+                document.getElementById('win-rate').textContent = `${data.win_rate}%`;
+            });
+        
+        // Odświeżanie całej strony co 5 minut
+        // To zapewni aktualizację wszystkich danych, w tym aktywnych transakcji
+    }, 30000);
+</script>
+{% endblock %} 

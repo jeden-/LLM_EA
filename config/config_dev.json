@@ -1,0 +1,44 @@
+{
+  "environment": "dev",
+  "logging": {
+    "level": "DEBUG",
+    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    "console": true,
+    "file": true,
+    "file_path": "logs/llm_trader.log"
+  },
+  "database": {
+    "url": "sqlite:///llm_trader.db",
+    "debug": true
+  },
+  "llm_engine": {
+    "api_key": "dummy_key_dev",
+    "api_url": "https://api.x.ai",
+    "model": "gpt-4o",
+    "max_tokens": 4096,
+    "temperature": 0.7,
+    "debug": true
+  },
+  "mt5_connector": {
+    "server": "Demo.MetaQuotes.net",
+    "login": 12345,
+    "password": "demo_password",
+    "timeout": 60000,
+    "debug": true
+  },
+  "agent_manager": {
+    "risk_level": "low",
+    "max_positions": 5,
+    "use_mock": true,
+    "debug": true
+  },
+  "dashboard": {
+    "port": 5000,
+    "host": "0.0.0.0",
+    "debug": true
+  },
+  "monitoring": {
+    "interval": 300,
+    "debug": true
+  }
+} 

@@ -1,50 +1,102 @@
-# LLM Trader dla MetaTrader 5
+# LLM Trading System
 
-System handlowy wykorzystujący lokalny model LLM (Ollama z Deepseek) do podejmowania decyzji inwestycyjnych na rynku Forex, zintegrowany z platformą MetaTrader 5.
-
-## Opis projektu
-
-System automatycznie analizuje dane rynkowe z MT5, stosuje strategię opisaną w "metoda_master.md" i podejmuje decyzje handlowe przy użyciu lokalnego modelu LLM. Pozycje są otwierane i zamykane za pośrednictwem Expert Advisor (EA) w MT5.
+System LLM Trading to zaawansowana platforma handlowa wykorzystująca modele językowe (LLM) do analizy rynku i generowania sygnałów handlowych. System integruje się z platformą MetaTrader 5 i umożliwia automatyczne podejmowanie decyzji inwestycyjnych.
 
 ## Główne funkcjonalności
 
-- Pobieranie i analiza danych rynkowych z MT5
-- Obliczanie wskaźników technicznych (50 SMA, ATR, VWAP)
-- Identyfikacja setupów handlowych przy użyciu lokalnego modelu LLM
-- Automatyczne otwieranie i zamykanie pozycji przez EA
-- Zarządzanie ryzykiem zgodnie ze strategią
-- Monitorowanie wyników i generowanie raportów
+- Analiza rynku z wykorzystaniem modeli LLM (np. Grok, GPT-4)
+- Automatyczne generowanie sygnałów handlowych
+- Zarządzanie ryzykiem i kapitałem
+- Integracja z platformą MetaTrader 5
+- Dashboard do monitorowania wyników i statystyk
+- Wsparcie dla wielu instrumentów finansowych i strategii
 
-## Wymagania systemowe
+## Struktura projektu
 
-- Windows 10/11 64-bit lub Linux (Ubuntu 22.04+)
-- Python 3.10+
-- MetaTrader 5
-- Ollama z modelem Deepseek
-- Min. 16GB RAM (32GB zalecane)
-- Min. 50GB wolnej przestrzeni na dysku (SSD)
-- Opcjonalnie: NVIDIA GPU z min. 8GB VRAM
+Projekt składa się z kilku głównych komponentów:
 
-## Struktura katalogów
+- **Agent_Manager** - Zarządzanie agentami handlowymi i strategiami
+- **Database** - Przechowywanie danych rynkowych, analiz i transakcji
+- **Dashboard** - Interfejs webowy do monitorowania systemu
+- **LLM_Engine** - Silnik modeli językowych do analizy rynku
+- **MT5_Connector** - Łącznik z platformą MetaTrader 5
+- **Expert_Advisor** - Kody dla MT5 Expert Advisors
 
-```
-LLM_Trader_MT5/
-├── MT5_Connector/          # Moduł komunikacji z MT5
-├── Expert_Advisor/         # Kod EA dla MT5
-├── LLM_Engine/             # Silnik analizy LLM
-├── Agent_Manager/          # Agent zarządzający
-├── Database/               # Warstwa bazy danych
-├── Dashboard/              # Interfejs użytkownika
-├── Common/                 # Współdzielone komponenty
-├── tests/                  # Testy
-├── docs/                   # Dokumentacja
-└── scripts/                # Skrypty pomocnicze
+Szczegółowy opis struktury znajduje się w pliku [docs/system_structure.md](docs/system_structure.md).
+
+## Uruchamianie systemu
+
+System można uruchomić na kilka sposobów:
+
+### 1. Uruchomienie całego systemu
+
+```bash
+python -m scripts.run_system [--env dev|test|prod] [--debug]
 ```
 
-## Stan projektu
+### 2. Uruchomienie poszczególnych komponentów
 
-Projekt jest w fazie implementacji. Aktualny status można sprawdzić w pliku [progress_tracking.md](../progress_tracking.md).
+```bash
+python -m Agent_Manager.run_manager [--env dev|test|prod]
+python -m Dashboard.run_dashboard [--port PORT]
+python -m MT5_Connector.run_connector
+python -m LLM_Engine.run_engine
+python -m Database.run_database
+```
+
+### 3. Narzędzia analityczne
+
+```bash
+python -m scripts.run_analysis --symbol EURUSD --timeframe H1
+python -m scripts.show_analysis --analysis-id ID
+```
+
+Więcej informacji o dostępnych skryptach znajduje się w pliku [scripts/README.md](scripts/README.md).
+
+## Instalacja
+
+Szczegółowa instrukcja instalacji znajduje się w pliku [docs/installation_guide.md](docs/installation_guide.md).
+
+Szybki start:
+
+```bash
+# Klonowanie repozytorium
+git clone https://github.com/twoj-username/llm-trader-mt5.git
+cd llm-trader-mt5
+
+# Instalacja zależności
+pip install -e .
+# lub z użyciem Poetry
+poetry install
+
+# Konfiguracja środowiska
+python -m scripts.setup_environment --env dev
+
+# Inicjalizacja bazy danych
+python -m scripts.setup_database --init
+```
+
+## Konfiguracja
+
+System używa plików konfiguracyjnych w formacie JSON, znajdujących się w katalogu `config/`:
+
+- `config_dev.json` - konfiguracja dla środowiska deweloperskiego
+- `config_test.json` - konfiguracja dla środowiska testowego
+- `config_prod.json` - konfiguracja dla środowiska produkcyjnego
+
+Dodatkowo, wrażliwe dane (klucze API, hasła) powinny być przechowywane w pliku `.env`.
+
+## Dokumentacja
+
+- [Instrukcja instalacji](docs/installation_guide.md)
+- [Struktura systemu](docs/system_structure.md)
+- [Zasady rozwoju](docs/rozwoj_systemu.md)
+- [API Reference](docs/api_reference.md)
+
+## Rozwijanie projektu
+
+Informacje dla deweloperów na temat rozwijania projektu znajdują się w pliku [docs/rozwoj_systemu.md](docs/rozwoj_systemu.md).
 
 ## Licencja
 
-Ten projekt jest dostępny na licencji MIT. Szczegóły w pliku LICENSE. 
+Ten projekt jest udostępniany na licencji MIT. Szczegóły w pliku [LICENSE](LICENSE). 

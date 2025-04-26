@@ -1,0 +1,9 @@
+{
+  "model_name": "grok-3-mini-fast-beta",
+  "model_type": "grok",
+  "xai_base_url": "https://api.x.ai/v1",
+  "timeout": 60,
+  "max_retries": 3,
+  "cache_dir": "tests/test_data/cache",
+  "enable_caching": true
+} 

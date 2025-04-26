@@ -1,0 +1,223 @@
+/* 
+ * Główny plik stylów dla dashboardu LLM Trading System
+ */
+
+:root {
+  --primary-color: #007bff;
+  --secondary-color: #6c757d;
+  --success-color: #28a745;
+  --danger-color: #dc3545;
+  --warning-color: #ffc107;
+  --info-color: #17a2b8;
+  --light-color: #f8f9fa;
+  --dark-color: #343a40;
+}
+
+/* Własne style dla dashboardu */
+.dashboard-card {
+  border-radius: 0.5rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-card-header {
+  background-color: rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  padding: 0.75rem 1.25rem;
+  font-weight: 600;
+}
+
+.dashboard-card-body {
+  padding: 1.25rem;
+}
+
+.text-profit {
+  color: var(--success-color);
+}
+
+.text-loss {
+  color: var(--danger-color);
+}
+
+/* Status badge */
+.badge-pending {
+  background-color: var(--warning-color);
+  color: #212529;
+}
+
+.badge-executed {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.badge-rejected {
+  background-color: var(--danger-color);
+  color: white;
+}
+
+.badge-expired {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.badge-completed {
+  background-color: var(--success-color);
+  color: white;
+}
+
+/* Trade direction */
+.direction-buy {
+  color: var(--success-color);
+  font-weight: bold;
+}
+
+.direction-sell {
+  color: var(--danger-color);
+  font-weight: bold;
+}
+
+/* Chart container */
+.chart-container {
+  width: 100%;
+  height: 400px;
+  margin-bottom: 1.5rem;
+}
+
+/* Trade idea details */
+.trade-idea-details {
+  margin-bottom: 2rem;
+}
+
+.key-value-pair {
+  display: flex;
+  margin-bottom: 0.5rem;
+}
+
+.key-value-pair .key {
+  font-weight: 600;
+  width: 200px;
+}
+
+/* Comments section */
+.comment {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  border: 1px solid #e9ecef;
+  border-radius: 0.25rem;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--secondary-color);
+}
+
+/* Image preview styles */
+.chart-preview {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #ddd;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.chart-preview:hover {
+  border-color: var(--primary-color);
+}
+
+.chart-modal-image {
+  max-width: 100%;
+  max-height: 80vh;
+}
+
+/* Overriding certain Bootstrap components */
+.card, .btn, .form-control, .input-group-text {
+  border-radius: 0.25rem;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+  background-color: #0069d9;
+  border-color: #0062cc;
+}
+
+.btn-success {
+  background-color: var(--success-color);
+  border-color: var(--success-color);
+}
+
+.btn-success:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+  border-color: var(--danger-color);
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+  border-color: #bd2130;
+}
+
+/* Pagination styling */
+.pagination .page-link {
+  color: var(--primary-color);
+}
+
+.pagination .page-item.active .page-link {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+/* Portfolio summary styling */
+.portfolio-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.summary-card {
+  flex: 1;
+  min-width: 200px;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: white;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.summary-card h4 {
+  margin-top: 0;
+  color: var(--secondary-color);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.summary-card .value {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .summary-card {
+    min-width: 100%;
+  }
+  
+  .key-value-pair {
+    flex-direction: column;
+  }
+  
+  .key-value-pair .key {
+    width: 100%;
+  }
+} 
