@@ -139,11 +139,12 @@
   - [x] Dokumentacja wdrożenia
   - [x] Skrypty instalacyjne i startowe
   - [x] Konfiguracja logowania i monitoringu
-- [ ] 5.5 Testy demo i optymalizacja (60%)
+- [ ] 5.5 Testy demo i optymalizacja (50%)
   - [x] Skrypty do diagnostyki i naprawy bazy danych
   - [x] Skonfigurowanie zdalnego repozytorium GitHub
   - [x] Synchronizacja projektu z repozytorium GitHub
   - [x] Naprawa i uruchomienie modułu monitoringu systemu
+  - [ ] Pokrycie kodu testami jednostkowymi, integracyjnymi i end-to-end w zakresie 90-100% (obecnie około 66%)
   - [ ] Uruchomienie systemu na koncie demo
   - [ ] Monitorowanie działania przez minimum 24h
   - [ ] Optymalizacja parametrów handlowych
@@ -162,7 +163,7 @@
 | M2 | Działający mechanizm decyzyjny LLM | 2024-09-29 | ✅ Ukończony |
 | M3 | Działająca komunikacja Python-EA | 2024-10-06 | ✅ Ukończony |
 | M4 | Pełna integracja komponentów | 2024-10-20 | ✅ Ukończony |
-| M5 | Zakończone testy na koncie demo | 2024-10-27 | ⏳ W trakcie (60%) |
+| M5 | Zakończone testy na koncie demo | 2024-10-27 | ⏳ W trakcie (50%) |
 | M6 | Wdrożenie na koncie rzeczywistym | 2024-11-03 | ⏳ Nie rozpoczęty |
 
 ## Notatki postępu
@@ -366,6 +367,14 @@
 - Poprawiono integrację z głównym skryptem run_system.py
 - Pomyślnie uruchomiono system z wszystkimi komponentami, w tym monitoring
 
+### 2024-10-02: Analiza pokrycia kodu testami
+- Przeprowadzono szczegółową analizę pokrycia kodu testami używając narzędzia coverage
+- Zidentyfikowano, że aktualne średnie pokrycie testami wynosi około 66%
+- Najlepsze pokrycie mają kluczowe komponenty: candlestick_patterns.py (100%), risk_manager.py (92%)
+- Zidentyfikowano moduły z niskim pokryciem wymagające dodatkowych testów: coordinator.py (18%), llm_interface.py (16%)
+- Zaktualizowano status postępu prac w odniesieniu do testów
+- Dodano punkt do wykonania: zwiększenie pokrycia testami, szczególnie dla modułów koordynacyjnych
+
 ## Problemy i wyzwania
 
 | ID | Opis problemu | Status | Rozwiązanie |
@@ -386,7 +395,7 @@
 
 | Miara | Wartość | Data aktualizacji |
 |-------|---------|-------------------|
-| Procent ukończenia | 96% | 2024-10-02 |
+| Procent ukończenia | 94% | 2024-10-02 |
 | Liczba zaimplementowanych komponentów | 26/26 | 2024-10-02 |
 | Liczba ukończonych kamieni milowych | 4/7 | 2024-10-02 |
 | Łączna liczba testów | 146 | 2024-10-02 |
