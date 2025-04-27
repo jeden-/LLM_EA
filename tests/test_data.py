@@ -135,6 +135,34 @@ class TestData:
         return base_data
     
     @staticmethod
+    def get_bullish_market_data(symbol='EURUSD', num_candles=100):
+        """
+        Generuje dane rynkowe z wyraźnym trendem wzrostowym.
+        
+        Args:
+            symbol: Symbol instrumentu
+            num_candles: Liczba świec
+            
+        Returns:
+            DataFrame z danymi OHLC przedstawiającymi trend wzrostowy
+        """
+        return TestData.get_trending_market_data(symbol=symbol, trend='up', num_candles=num_candles)
+    
+    @staticmethod
+    def get_bearish_market_data(symbol='EURUSD', num_candles=100):
+        """
+        Generuje dane rynkowe z wyraźnym trendem spadkowym.
+        
+        Args:
+            symbol: Symbol instrumentu
+            num_candles: Liczba świec
+            
+        Returns:
+            DataFrame z danymi OHLC przedstawiającymi trend spadkowy
+        """
+        return TestData.get_trending_market_data(symbol=symbol, trend='down', num_candles=num_candles)
+    
+    @staticmethod
     def get_ranging_market_data(symbol='EURUSD', num_candles=100, range_width=0.02):
         """
         Generuje dane dla rynku w konsolidacji (range-bound).
@@ -248,6 +276,68 @@ class TestData:
                 else:
                     # Przebicie - zostawiamy cenę bez zmian
                     pass
+        
+        return base_data
+    
+    @staticmethod
+    def get_consolidation_market_data(symbol='EURUSD', breakout_direction='up', num_candles=100, consolidation_range_percent=0.01):
+        """
+        Generuje dane dla rynku w konsolidacji z wybiciem.
+        
+        Args:
+            symbol: Symbol instrumentu
+            breakout_direction: Kierunek wybicia ('up' lub 'down')
+            num_candles: Liczba świec
+            consolidation_range_percent: Szerokość konsolidacji jako procent ceny początkowej
+            
+        Returns:
+            DataFrame z danymi OHLC przedstawiającymi konsolidację z wybiciem
+        """
+        base_data = TestData.generate_ohlc_data(symbol=symbol, num_candles=num_candles)
+        
+        # Parametry konsolidacji
+        midpoint = base_data.iloc[0]['close']
+        range_half_width = midpoint * consolidation_range_percent / 2
+        
+        # Określamy punkt wybicia (około 70% danych)
+        breakout_point = int(num_candles * 0.7)
+        
+        for i in range(len(base_data)):
+            if i < breakout_point:
+                # Faza konsolidacji - oscylacja wokół punktu środkowego
+                oscillation = np.sin(i * 0.3) * range_half_width
+                
+                base_data.iloc[i, base_data.columns.get_loc('open')] = midpoint + oscillation * 0.9
+                base_data.iloc[i, base_data.columns.get_loc('close')] = midpoint + oscillation * 1.1
+                base_data.iloc[i, base_data.columns.get_loc('high')] = max(
+                    base_data.iloc[i]['open'], 
+                    base_data.iloc[i]['close']
+                ) + abs(oscillation) * 0.2
+                base_data.iloc[i, base_data.columns.get_loc('low')] = min(
+                    base_data.iloc[i]['open'], 
+                    base_data.iloc[i]['close']
+                ) - abs(oscillation) * 0.2
+            else:
+                # Faza wybicia
+                breakout_progress = (i - breakout_point) / (num_candles - breakout_point)
+                trend_factor = 0.05 if breakout_direction == 'up' else -0.05  # 5% wybicie
+                trend_change = breakout_progress * trend_factor * midpoint
+                
+                # Dodanie losowego szumu do trendu
+                noise = np.random.normal(0, 0.001) * midpoint
+                total_change = trend_change + noise
+                
+                # Aplikowanie zmiany do wszystkich cen OHLC
+                base_data.iloc[i, base_data.columns.get_loc('open')] = midpoint + total_change * 0.9
+                base_data.iloc[i, base_data.columns.get_loc('close')] = midpoint + total_change * 1.1
+                base_data.iloc[i, base_data.columns.get_loc('high')] = max(
+                    midpoint + total_change * 0.9, 
+                    midpoint + total_change * 1.1
+                ) + abs(total_change) * 0.2
+                base_data.iloc[i, base_data.columns.get_loc('low')] = min(
+                    midpoint + total_change * 0.9, 
+                    midpoint + total_change * 1.1
+                ) - abs(total_change) * 0.2
         
         return base_data
     
